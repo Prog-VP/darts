@@ -11,6 +11,8 @@ export default function ThreeBackground() {
     if (!container) {
       return;
     }
+    const mobileQuery = window.matchMedia("(max-width: 640px)");
+    const isMobile = mobileQuery.matches;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(65, 1, 0.1, 100);
@@ -20,39 +22,49 @@ export default function ThreeBackground() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    const group = new THREE.Group();
-    scene.add(group);
+    let group: THREE.Group | null = null;
+    let ringMaterial: THREE.MeshBasicMaterial | null = null;
+    let cyanMaterial: THREE.MeshBasicMaterial | null = null;
+    let torusOuter: THREE.Mesh | null = null;
+    let torusInner: THREE.Mesh | null = null;
+    let knot: THREE.Mesh | null = null;
+    let core: THREE.Mesh | null = null;
 
-    const ringMaterial = new THREE.MeshBasicMaterial({
-      color: 0x8a5cff,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.46
-    });
+    if (!isMobile) {
+      group = new THREE.Group();
+      scene.add(group);
 
-    const cyanMaterial = new THREE.MeshBasicMaterial({
-      color: 0x45d5ff,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.5
-    });
+      ringMaterial = new THREE.MeshBasicMaterial({
+        color: 0x8a5cff,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.46
+      });
 
-    const torusOuter = new THREE.Mesh(
-      new THREE.TorusGeometry(2.8, 0.045, 20, 170),
-      ringMaterial
-    );
-    const torusInner = new THREE.Mesh(
-      new THREE.TorusGeometry(1.85, 0.035, 20, 160),
-      cyanMaterial
-    );
-    const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.1, 0.03, 170, 20), ringMaterial);
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 1), cyanMaterial);
+      cyanMaterial = new THREE.MeshBasicMaterial({
+        color: 0x45d5ff,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5
+      });
 
-    torusOuter.rotation.x = 0.95;
-    torusInner.rotation.y = 0.65;
-    knot.rotation.z = 0.45;
+      torusOuter = new THREE.Mesh(
+        new THREE.TorusGeometry(2.8, 0.045, 20, 170),
+        ringMaterial
+      );
+      torusInner = new THREE.Mesh(
+        new THREE.TorusGeometry(1.85, 0.035, 20, 160),
+        cyanMaterial
+      );
+      knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.1, 0.03, 170, 20), ringMaterial);
+      core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 1), cyanMaterial);
 
-    group.add(torusOuter, torusInner, knot, core);
+      torusOuter.rotation.x = 0.95;
+      torusInner.rotation.y = 0.65;
+      knot.rotation.z = 0.45;
+
+      group.add(torusOuter, torusInner, knot, core);
+    }
 
     const buildParticles = (count: number, color: number, spread: number) => {
       const positions = new Float32Array(count * 3);
@@ -95,19 +107,23 @@ export default function ThreeBackground() {
 
     onResize();
     window.addEventListener("resize", onResize);
-    window.addEventListener("pointermove", onPointerMove);
+    if (!isMobile) {
+      window.addEventListener("pointermove", onPointerMove);
+    }
 
     let frame = 0;
     let rafId = 0;
 
     const animate = () => {
       frame += 0.006;
-      group.rotation.y = frame + mouse.x * 0.2;
-      group.rotation.x = Math.sin(frame * 0.75) * 0.18 + mouse.y * 0.08;
-      knot.rotation.x += 0.008;
-      knot.rotation.y += 0.006;
-      core.rotation.y -= 0.01;
-      core.rotation.x += 0.008;
+      if (group && knot && core) {
+        group.rotation.y = frame + mouse.x * 0.2;
+        group.rotation.x = Math.sin(frame * 0.75) * 0.18 + mouse.y * 0.08;
+        knot.rotation.x += 0.008;
+        knot.rotation.y += 0.006;
+        core.rotation.y -= 0.01;
+        core.rotation.x += 0.008;
+      }
       particlesFront.rotation.y = -frame * 0.35;
       particlesBack.rotation.y = frame * 0.2;
       renderer.render(scene, camera);
@@ -119,16 +135,18 @@ export default function ThreeBackground() {
     return () => {
       window.cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("pointermove", onPointerMove);
+      if (!isMobile) {
+        window.removeEventListener("pointermove", onPointerMove);
+      }
       container.removeChild(renderer.domElement);
 
-      torusOuter.geometry.dispose();
-      torusInner.geometry.dispose();
-      knot.geometry.dispose();
-      core.geometry.dispose();
+      torusOuter?.geometry.dispose();
+      torusInner?.geometry.dispose();
+      knot?.geometry.dispose();
+      core?.geometry.dispose();
 
-      ringMaterial.dispose();
-      cyanMaterial.dispose();
+      ringMaterial?.dispose();
+      cyanMaterial?.dispose();
 
       (particlesFront.geometry as THREE.BufferGeometry).dispose();
       (particlesBack.geometry as THREE.BufferGeometry).dispose();
