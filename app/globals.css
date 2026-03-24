@@ -34,7 +34,6 @@ body {
   justify-content: center;
   padding: clamp(1rem, 3.5vh, 2.5rem) 0;
   overflow-x: hidden;
-  overflow-y: auto;
   perspective: 1200px;
 }
 
