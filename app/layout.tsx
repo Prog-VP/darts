@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Ouverture le 1er août 2026 — Darts room à Lausanne avec une ambiance immersive.",
   openGraph: {
-    title: "lausanne-darts.ch | Coming 1er août 2026",
+    title: "Lausanne Darts | Coming 1er août 2026",
     description: "Darts room à Lausanne. Ouverture officielle le 1er août 2026.",
     url: "https://lausanne-darts.ch",
     type: "website",

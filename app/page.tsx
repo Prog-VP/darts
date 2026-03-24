@@ -44,7 +44,7 @@ export default function Home() {
 
       <section className="hero container">
         <p className="eyebrow">Lausanne-Darts.ch</p>
-        <h1>Coming&nbsp;1er&nbsp;août&nbsp;2026</h1>
+        <h1>Coming 1er août 2026</h1>
         <p className="subtitle">Darts room 🎯 · Lausanne</p>
 
         <div className="countdown" role="timer" aria-live="polite">
