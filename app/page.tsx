@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import InviteForm from "./components/InviteForm";
 import ThreeBackground from "./ThreeBackground";
 
 type Countdown = {
@@ -45,19 +46,10 @@ export default function Home() {
       <section className="hero container">
         <div className="dart-trail" aria-hidden="true" />
         <p className="eyebrow">Lausanne-Darts.ch</p>
-        <h1>Coming 1er août 2026</h1>
+        <h1>Ouverture le 1er août 2026</h1>
         <p className="subtitle">
-          Le nouveau spot fléchettes premium à Lausanne.
+          Le nouveau spot fléchettes premium à Lausanne. Plus d&apos;infos à suivre.
         </p>
-
-        <div className="cta-group" aria-label="Actions principales">
-          <a className="cta cta-primary" href="mailto:hello@lausanne-darts.ch">
-            Je veux être invité à l&apos;ouverture
-          </a>
-          <a className="cta cta-secondary" href="#infos">
-            Voir les infos
-          </a>
-        </div>
 
         <div className="countdown" role="timer" aria-live="polite">
           <div className="count-item">
@@ -88,6 +80,8 @@ export default function Home() {
           <span role="listitem">Lausanne, Suisse</span>
           <span role="listitem">1er août 2026</span>
         </div>
+
+        <InviteForm />
       </section>
     </main>
   );
