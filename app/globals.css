@@ -303,6 +303,68 @@ h1 {
   letter-spacing: 0.01em;
 }
 
+
+.invite {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(123, 158, 255, 0.24);
+  border-radius: 18px;
+  padding: 1rem;
+  background: linear-gradient(145deg, rgba(14, 18, 34, 0.86), rgba(10, 9, 22, 0.9));
+}
+
+.invite h2 {
+  margin: 0;
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+}
+
+.invite p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.invite-form {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.invite-form label {
+  font-size: 0.85rem;
+  color: #d9e2ff;
+}
+
+.invite-form input {
+  border: 1px solid rgba(123, 158, 255, 0.3);
+  border-radius: 10px;
+  padding: 0.62rem 0.7rem;
+  background: rgba(8, 10, 20, 0.85);
+  color: #f3f6ff;
+}
+
+.invite-form input:focus-visible {
+  outline: 2px solid rgba(122, 164, 255, 0.65);
+  outline-offset: 1px;
+}
+
+.invite-form button {
+  margin-top: 0.3rem;
+  border: 1px solid rgba(126, 177, 255, 0.45);
+  border-radius: 999px;
+  min-height: 40px;
+  color: #f4f8ff;
+  font-size: 0.92rem;
+  font-weight: 640;
+  background: linear-gradient(115deg, rgba(83, 126, 255, 0.38), rgba(117, 76, 255, 0.4));
+  cursor: pointer;
+}
+
+.form-success {
+  margin-top: 0.75rem;
+  color: #b9ffde;
+  font-weight: 600;
+}
+
 @keyframes float {
   0%,
   100% {
