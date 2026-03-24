@@ -16,20 +16,22 @@ const INITIAL_FORM: InviteFormData = {
 
 export default function InviteForm() {
   const [formData, setFormData] = useState<InviteFormData>(INITIAL_FORM);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedFirstName, setSubmittedFirstName] = useState<string | null>(null);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsSubmitted(true);
+    setSubmittedFirstName(formData.prenom.trim());
+    setFormData(INITIAL_FORM);
+
+    window.setTimeout(() => {
+      setSubmittedFirstName(null);
+    }, 4200);
   };
 
   return (
     <section className="invite" aria-labelledby="invite-title">
       <h2 id="invite-title">Soyez invité à l&apos;ouverture</h2>
-      <p>
-        Laissez vos infos pour recevoir les prochaines annonces. (Formulaire
-        front-end uniquement pour le moment.)
-      </p>
+      <p>Laissez vos infos pour recevoir les prochaines annonces.</p>
 
       <form className="invite-form" onSubmit={handleSubmit}>
         <label htmlFor="nom">Nom</label>
@@ -74,8 +76,19 @@ export default function InviteForm() {
         <button type="submit">Enter</button>
       </form>
 
-      {isSubmitted ? (
-        <p className="form-success">Merci d&apos;avoir complété le formulaire.</p>
+      {submittedFirstName ? (
+        <div className="form-success-toast" role="status" aria-live="polite">
+          <span className="spark spark-1" aria-hidden="true">
+            ✨
+          </span>
+          <span className="spark spark-2" aria-hidden="true">
+            ✦
+          </span>
+          <p className="form-success">
+            Merci {submittedFirstName} ! On se réjouit de te donner plus
+            d&apos;infos.
+          </p>
+        </div>
       ) : null}
     </section>
   );
