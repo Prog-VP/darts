@@ -43,9 +43,21 @@ export default function Home() {
       <div className="noise" aria-hidden="true" />
 
       <section className="hero container">
+        <div className="dart-trail" aria-hidden="true" />
         <p className="eyebrow">Lausanne-Darts.ch</p>
         <h1>Coming 1er août 2026</h1>
-        <p className="subtitle">Darts room 🎯 · Lausanne</p>
+        <p className="subtitle">
+          Le nouveau spot fléchettes premium à Lausanne.
+        </p>
+
+        <div className="cta-group" aria-label="Actions principales">
+          <a className="cta cta-primary" href="mailto:hello@lausanne-darts.ch">
+            Je veux être invité à l&apos;ouverture
+          </a>
+          <a className="cta cta-secondary" href="#infos">
+            Voir les infos
+          </a>
+        </div>
 
         <div className="countdown" role="timer" aria-live="polite">
           <div className="count-item">
@@ -66,7 +78,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="badges" role="list" aria-label="Informations clés">
+        <div
+          className="badges"
+          role="list"
+          aria-label="Informations clés"
+          id="infos"
+        >
           <span role="listitem">Ouverture publique</span>
           <span role="listitem">Lausanne, Suisse</span>
           <span role="listitem">1er août 2026</span>
