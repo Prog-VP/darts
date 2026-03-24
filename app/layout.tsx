@@ -5,11 +5,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://lausanne-darts.ch"),
   title: "Lausanne Darts | Salon de fléchettes premium",
   description:
-    "Ouverture le 01.08.2026 — Lausanne Darts, le nouveau salon de fléchettes premium à Lausanne.",
+    "Ouverture le 1er août 2026 — Lausanne Darts, le nouveau salon de fléchettes premium à Lausanne.",
   openGraph: {
-    title: "Lausanne Darts | Coming 01.08.2026",
+    title: "Lausanne Darts | Coming 1er août 2026",
     description:
-      "Salon de fléchettes premium, ambiance dark & moderne à Lausanne. Ouverture officielle le 01.08.2026.",
+      "Salon de fléchettes premium, ambiance dark & moderne à Lausanne. Ouverture officielle le 1er août 2026.",
     url: "https://lausanne-darts.ch",
     type: "website",
     locale: "fr_CH"

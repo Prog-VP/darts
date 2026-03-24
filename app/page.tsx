@@ -44,7 +44,7 @@ export default function Home() {
 
       <section className="hero container">
         <p className="eyebrow">Lausanne-Darts.ch</p>
-        <h1>Coming&nbsp;01.08.2026</h1>
+        <h1>Coming&nbsp;1er&nbsp;août&nbsp;2026</h1>
         <p className="subtitle">Salon de fléchettes · Lausanne</p>
 
         <div className="countdown" role="timer" aria-live="polite">
@@ -67,9 +67,9 @@ export default function Home() {
         </div>
 
         <div className="badges" role="list" aria-label="Informations clés">
-          <span role="listitem">Inscriptions bientôt</span>
+          <span role="listitem">Ouverture publique</span>
           <span role="listitem">Site officiel</span>
-          <span role="listitem">01.08.2026</span>
+          <span role="listitem">1er août 2026</span>
         </div>
       </section>
     </main>
