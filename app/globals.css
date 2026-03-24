@@ -303,6 +303,99 @@ h1 {
   letter-spacing: 0.01em;
 }
 
+
+.invite {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(123, 158, 255, 0.24);
+  border-radius: 18px;
+  padding: 1rem;
+  background: linear-gradient(145deg, rgba(14, 18, 34, 0.86), rgba(10, 9, 22, 0.9));
+}
+
+.invite h2 {
+  margin: 0;
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+}
+
+.invite p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.invite-form {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.invite-form label {
+  font-size: 0.85rem;
+  color: #d9e2ff;
+}
+
+.invite-form input {
+  border: 1px solid rgba(123, 158, 255, 0.3);
+  border-radius: 10px;
+  padding: 0.62rem 0.7rem;
+  background: rgba(8, 10, 20, 0.85);
+  color: #f3f6ff;
+}
+
+.invite-form input:focus-visible {
+  outline: 2px solid rgba(122, 164, 255, 0.65);
+  outline-offset: 1px;
+}
+
+.invite-form button {
+  margin-top: 0.3rem;
+  border: 1px solid rgba(126, 177, 255, 0.45);
+  border-radius: 999px;
+  min-height: 40px;
+  color: #f4f8ff;
+  font-size: 0.92rem;
+  font-weight: 640;
+  background: linear-gradient(115deg, rgba(83, 126, 255, 0.38), rgba(117, 76, 255, 0.4));
+  cursor: pointer;
+}
+
+.form-success {
+  margin: 0;
+  color: #d7ffec;
+  font-weight: 600;
+}
+
+.form-success-toast {
+  position: relative;
+  margin-top: 0.85rem;
+  border: 1px solid rgba(143, 255, 211, 0.35);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  background: radial-gradient(circle at 14% 20%, rgba(150, 255, 220, 0.22), transparent 45%),
+    linear-gradient(120deg, rgba(12, 38, 41, 0.88), rgba(9, 22, 30, 0.9));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), inset 0 0 18px rgba(137, 255, 214, 0.14);
+  overflow: hidden;
+  animation: toastPop 420ms cubic-bezier(0.2, 0.85, 0.28, 1) both;
+}
+
+.spark {
+  position: absolute;
+  font-size: 1rem;
+  opacity: 0.8;
+  animation: sparkleBurst 1.2s ease-out forwards;
+}
+
+.spark-1 {
+  top: 0.32rem;
+  right: 0.5rem;
+}
+
+.spark-2 {
+  top: -0.1rem;
+  right: 1.3rem;
+  animation-delay: 120ms;
+}
+
 @keyframes float {
   0%,
   100% {
@@ -362,6 +455,32 @@ h1 {
   68% {
     transform: translateX(-260px) rotate(-15deg);
     opacity: 0;
+  }
+}
+
+@keyframes toastPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sparkleBurst {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.8);
+  }
+  35% {
+    opacity: 1;
+    transform: translate3d(-2px, -2px, 0) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-4px, -14px, 0) scale(1.18);
   }
 }
 
