@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import ThreeBackground from "./ThreeBackground";
 
 type Countdown = {
   days: number;
@@ -36,6 +37,7 @@ export default function Home() {
 
   return (
     <main className="page">
+      <ThreeBackground />
       <div className="ambient ambient-1" aria-hidden="true" />
       <div className="ambient ambient-2" aria-hidden="true" />
       <div className="noise" aria-hidden="true" />
