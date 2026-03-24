@@ -48,7 +48,8 @@ export default function Home() {
         <p className="eyebrow">Lausanne-Darts.ch</p>
         <h1>Ouverture le 1er août 2026</h1>
         <p className="subtitle">
-          Le nouveau spot fléchettes premium à Lausanne. Plus d&apos;infos à suivre.
+          Le nouveau spot fléchettes premium <span className="no-wrap">à Lausanne.</span>{" "}
+          Plus d&apos;infos à suivre.
         </p>
 
         <div className="countdown" role="timer" aria-live="polite">

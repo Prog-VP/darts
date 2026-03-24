@@ -29,9 +29,12 @@ body {
 .page {
   position: relative;
   min-height: 100vh;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 3.5vh, 2.5rem) 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   perspective: 1200px;
 }
 
@@ -186,6 +189,10 @@ h1 {
   letter-spacing: 0.01em;
   max-width: 38ch;
   animation: heroEntrance 780ms cubic-bezier(0.2, 0.85, 0.28, 1) both;
+}
+
+.no-wrap {
+  white-space: nowrap;
 }
 
 .cta-group {
