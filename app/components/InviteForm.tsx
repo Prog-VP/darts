@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 type InviteFormData = {
   nom: string;
@@ -14,82 +14,113 @@ const INITIAL_FORM: InviteFormData = {
   email: "",
 };
 
+const FORM_FIELDS: Array<{
+  id: keyof InviteFormData;
+  label: string;
+  autoComplete: string;
+  placeholder: string;
+  type?: "email" | "text";
+}> = [
+  {
+    id: "prenom",
+    label: "Prénom",
+    autoComplete: "given-name",
+    placeholder: "Ton prénom",
+  },
+  {
+    id: "nom",
+    label: "Nom",
+    autoComplete: "family-name",
+    placeholder: "Ton nom",
+  },
+  {
+    id: "email",
+    label: "Email",
+    autoComplete: "email",
+    placeholder: "ton@email.ch",
+    type: "email",
+  },
+];
+
 export default function InviteForm() {
   const [formData, setFormData] = useState<InviteFormData>(INITIAL_FORM);
-  const [submittedFirstName, setSubmittedFirstName] = useState<string | null>(null);
+  const [submittedFirstName, setSubmittedFirstName] = useState<string | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (!submittedFirstName) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setSubmittedFirstName(null);
+    }, 4200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [submittedFirstName]);
+
+  const handleChange =
+    (field: keyof InviteFormData) => (event: ChangeEvent<HTMLInputElement>) => {
+      setFormData((current) => ({ ...current, [field]: event.target.value }));
+    };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmittedFirstName(formData.prenom.trim());
-    setFormData(INITIAL_FORM);
 
-    window.setTimeout(() => {
-      setSubmittedFirstName(null);
-    }, 4200);
+    const trimmedFirstName = formData.prenom.trim();
+
+    setSubmittedFirstName(trimmedFirstName || "toi");
+    setFormData(INITIAL_FORM);
   };
 
   return (
-    <section className="invite" aria-labelledby="invite-title">
-      <h2 id="invite-title">Soyez invité à l&apos;ouverture</h2>
-      <p>Laissez vos infos pour recevoir les prochaines annonces.</p>
+    <div className="invite" aria-labelledby="invite-title">
+      <div className="invite-header">
+        <h2 id="invite-title">Ton e-mail</h2>
+      </div>
 
       <form className="invite-form" onSubmit={handleSubmit}>
-        <label htmlFor="nom">Nom</label>
-        <input
-          id="nom"
-          name="nom"
-          type="text"
-          autoComplete="family-name"
-          required
-          value={formData.nom}
-          onChange={(event) =>
-            setFormData((current) => ({ ...current, nom: event.target.value }))
-          }
-        />
+        <div className="invite-grid">
+          {FORM_FIELDS.map((field) => (
+            <div
+              key={field.id}
+              className={`field-group ${
+                field.id === "email" ? "field-group-wide" : ""
+              }`}
+            >
+              <label htmlFor={field.id}>{field.label}</label>
+              <input
+                id={field.id}
+                name={field.id}
+                type={field.type ?? "text"}
+                autoComplete={field.autoComplete}
+                placeholder={field.placeholder}
+                inputMode={field.id === "email" ? "email" : "text"}
+                required
+                value={formData[field.id]}
+                onChange={handleChange(field.id)}
+              />
+            </div>
+          ))}
+        </div>
 
-        <label htmlFor="prenom">Prénom</label>
-        <input
-          id="prenom"
-          name="prenom"
-          type="text"
-          autoComplete="given-name"
-          required
-          value={formData.prenom}
-          onChange={(event) =>
-            setFormData((current) => ({ ...current, prenom: event.target.value }))
-          }
-        />
+        <p className="form-note">
+          Un mail au lancement. Pas de spam.
+        </p>
 
-        <label htmlFor="email">Adresse mail</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={formData.email}
-          onChange={(event) =>
-            setFormData((current) => ({ ...current, email: event.target.value }))
-          }
-        />
-
-        <button type="submit">Enter</button>
+        <button type="submit">S’inscrire</button>
       </form>
 
       {submittedFirstName ? (
         <div className="form-success-toast" role="status" aria-live="polite">
-          <span className="spark spark-1" aria-hidden="true">
-            ✨
-          </span>
-          <span className="spark spark-2" aria-hidden="true">
-            ✦
-          </span>
           <p className="form-success">
-            Merci {submittedFirstName} ! On se réjouit de te donner plus
-            d&apos;infos.
+            {"Merci "}
+            {submittedFirstName}
+            {", c’est noté."}
           </p>
         </div>
       ) : null}
-    </section>
+    </div>
   );
 }

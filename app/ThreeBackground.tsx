@@ -3,6 +3,36 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
+function createParticleField(
+  count: number,
+  color: number,
+  spread: number,
+  size: number,
+  opacity: number
+) {
+  const positions = new Float32Array(count * 3);
+
+  for (let index = 0; index < count; index += 1) {
+    const cursor = index * 3;
+    positions[cursor] = (Math.random() - 0.5) * spread;
+    positions[cursor + 1] = (Math.random() - 0.5) * spread * 0.65;
+    positions[cursor + 2] = (Math.random() - 0.5) * spread;
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+  const material = new THREE.PointsMaterial({
+    color,
+    size,
+    transparent: true,
+    opacity,
+    depthWrite: false,
+  });
+
+  return new THREE.Points(geometry, material);
+}
+
 export default function ThreeBackground() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -11,87 +41,59 @@ export default function ThreeBackground() {
     if (!container) {
       return;
     }
-    const mobileQuery = window.matchMedia("(max-width: 640px)");
-    const isMobile = mobileQuery.matches;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
+    const isCompactViewport = window.innerWidth < 768;
+
+    const density = prefersReducedMotion ? 0.45 : isCompactViewport ? 0.7 : 1;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(65, 1, 0.1, 100);
     camera.position.z = 7;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({
+      antialias: !isCompactViewport,
+      alpha: true,
+      powerPreference: "high-performance",
+    });
+
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, isCompactViewport ? 1.5 : 2)
+    );
+
     container.appendChild(renderer.domElement);
 
-    let group: THREE.Group | null = null;
-    let ringMaterial: THREE.MeshBasicMaterial | null = null;
-    let cyanMaterial: THREE.MeshBasicMaterial | null = null;
-    let torusOuter: THREE.Mesh | null = null;
-    let torusInner: THREE.Mesh | null = null;
-    let knot: THREE.Mesh | null = null;
-    let core: THREE.Mesh | null = null;
+    const particlesRed = createParticleField(
+      Math.round(120 * density),
+      0xe63946,
+      28,
+      0.012,
+      0.42
+    );
+    const particlesAmber = createParticleField(
+      Math.round(260 * density),
+      0xf4a024,
+      24,
+      0.014,
+      0.34
+    );
+    const particlesGold = createParticleField(
+      Math.round(140 * density),
+      0xffd666,
+      30,
+      0.01,
+      0.28
+    );
 
-    if (!isMobile) {
-      group = new THREE.Group();
-      scene.add(group);
+    particlesGold.position.z = -3;
 
-      ringMaterial = new THREE.MeshBasicMaterial({
-        color: 0x8a5cff,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.46
-      });
-
-      cyanMaterial = new THREE.MeshBasicMaterial({
-        color: 0x45d5ff,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.5
-      });
-
-      torusOuter = new THREE.Mesh(
-        new THREE.TorusGeometry(2.8, 0.045, 20, 170),
-        ringMaterial
-      );
-      torusInner = new THREE.Mesh(
-        new THREE.TorusGeometry(1.85, 0.035, 20, 160),
-        cyanMaterial
-      );
-      knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.1, 0.03, 170, 20), ringMaterial);
-      core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 1), cyanMaterial);
-
-      torusOuter.rotation.x = 0.95;
-      torusInner.rotation.y = 0.65;
-      knot.rotation.z = 0.45;
-
-      group.add(torusOuter, torusInner, knot, core);
-    }
-
-    const buildParticles = (count: number, color: number, spread: number) => {
-      const positions = new Float32Array(count * 3);
-      for (let i = 0; i < count; i += 1) {
-        const i3 = i * 3;
-        positions[i3] = (Math.random() - 0.5) * spread;
-        positions[i3 + 1] = (Math.random() - 0.5) * (spread * 0.7);
-        positions[i3 + 2] = (Math.random() - 0.5) * spread;
-      }
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-      const material = new THREE.PointsMaterial({
-        size: 0.028,
-        color,
-        transparent: true,
-        opacity: 0.7
-      });
-      return new THREE.Points(geometry, material);
-    };
-
-    const particlesFront = buildParticles(360, 0xcde7ff, 22);
-    const particlesBack = buildParticles(220, 0x8a5cff, 28);
-    particlesBack.position.z = -2;
-
-    scene.add(particlesFront, particlesBack);
+    scene.add(particlesRed, particlesAmber, particlesGold);
 
     const mouse = { x: 0, y: 0 };
+
     const onPointerMove = (event: PointerEvent) => {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = (event.clientY / window.innerHeight) * 2 - 1;
@@ -100,58 +102,61 @@ export default function ThreeBackground() {
     const onResize = () => {
       const width = container.clientWidth;
       const height = container.clientHeight;
+
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
+      renderer.render(scene, camera);
     };
 
     onResize();
     window.addEventListener("resize", onResize);
-    if (!isMobile) {
+
+    if (hasFinePointer && !prefersReducedMotion) {
       window.addEventListener("pointermove", onPointerMove);
     }
 
     let frame = 0;
     let rafId = 0;
 
-    const animate = () => {
-      frame += 0.006;
-      if (group && knot && core) {
-        group.rotation.y = frame + mouse.x * 0.2;
-        group.rotation.x = Math.sin(frame * 0.75) * 0.18 + mouse.y * 0.08;
-        knot.rotation.x += 0.008;
-        knot.rotation.y += 0.006;
-        core.rotation.y -= 0.01;
-        core.rotation.x += 0.008;
-      }
-      particlesFront.rotation.y = -frame * 0.35;
-      particlesBack.rotation.y = frame * 0.2;
+    const renderFrame = () => {
+      frame += prefersReducedMotion ? 0.0015 : 0.004;
+
+      particlesRed.rotation.y = frame * 0.25 + mouse.x * 0.04;
+      particlesRed.rotation.x = mouse.y * 0.025;
+
+      particlesAmber.rotation.y = -frame * 0.18 + mouse.x * 0.06;
+      particlesAmber.rotation.x = Math.sin(frame * 0.45) * 0.1 + mouse.y * 0.03;
+
+      particlesGold.rotation.y = frame * 0.12;
+      particlesGold.rotation.x = Math.cos(frame * 0.25) * 0.08;
+
       renderer.render(scene, camera);
-      rafId = window.requestAnimationFrame(animate);
+      rafId = window.requestAnimationFrame(renderFrame);
     };
 
-    rafId = window.requestAnimationFrame(animate);
+    if (prefersReducedMotion) {
+      renderer.render(scene, camera);
+    } else {
+      rafId = window.requestAnimationFrame(renderFrame);
+    }
 
     return () => {
       window.cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onResize);
-      if (!isMobile) {
+
+      if (hasFinePointer && !prefersReducedMotion) {
         window.removeEventListener("pointermove", onPointerMove);
       }
-      container.removeChild(renderer.domElement);
 
-      torusOuter?.geometry.dispose();
-      torusInner?.geometry.dispose();
-      knot?.geometry.dispose();
-      core?.geometry.dispose();
+      if (container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
+      }
 
-      ringMaterial?.dispose();
-      cyanMaterial?.dispose();
-
-      (particlesFront.geometry as THREE.BufferGeometry).dispose();
-      (particlesBack.geometry as THREE.BufferGeometry).dispose();
-      (particlesFront.material as THREE.PointsMaterial).dispose();
-      (particlesBack.material as THREE.PointsMaterial).dispose();
+      [particlesRed, particlesAmber, particlesGold].forEach((particles) => {
+        particles.geometry.dispose();
+        (particles.material as THREE.PointsMaterial).dispose();
+      });
 
       renderer.dispose();
     };
