@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       auth: { user, pass },
     });
 
+    // 1. Notification interne
     await transporter.sendMail({
       from: `"Lausanne Darts" <${CONTACT_EMAIL}>`,
       to: CONTACT_EMAIL,
@@ -43,6 +44,59 @@ export async function POST(request: NextRequest) {
           <p><strong>Prénom :</strong> ${escapeHtml(prenom)}</p>
           <p><strong>Nom :</strong> ${escapeHtml(nom)}</p>
           <p><strong>Email :</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+        </div>
+      `,
+    });
+
+    // 2. Confirmation envoyée au visiteur
+    await transporter.sendMail({
+      from: `"Lausanne Darts" <${CONTACT_EMAIL}>`,
+      to: email,
+      subject: "Merci pour ton inscription — Lausanne Darts 🎯",
+      text: `Hello ${prenom},\n\nMerci pour ton inscription — on est ravis de te compter parmi les premiers à suivre l'aventure Lausanne Darts.\n\nOn t'écrira au lancement, le 1er août 2026.\nRue St-Martin 9, Lausanne.\n\nEn attendant, si tu veux tester ta précision : lausanne-darts.ch/jeu (un 180 = une partie offerte à l'ouverture 😉).\n\nÀ très vite,\nL'équipe Lausanne Darts`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a1a; max-width: 560px; margin: 0 auto; padding: 32px 28px; background: #0a0a0a; color: #F0E6D2; border-radius: 12px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 0.02em; line-height: 1;">
+              <div>LAUSANNE</div>
+              <div style="letter-spacing: 0.38em; margin-left: 0.38em;">DARTS</div>
+              <div style="height: 2px; background: #E63946; margin: 8px auto 2px; max-width: 220px; border-radius: 2px;"></div>
+              <div style="height: 2px; background: #2D8B46; margin: 0 auto; max-width: 220px; border-radius: 2px;"></div>
+            </div>
+          </div>
+
+          <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.04em; margin: 24px 0 12px; color: #F0E6D2;">
+            Merci pour ton inscription, ${escapeHtml(prenom)} 🎯
+          </h1>
+
+          <p style="font-size: 15px; line-height: 1.6; color: #cfcfc5;">
+            On est ravis de te compter parmi les premiers à suivre l'aventure <strong style="color: #F0E6D2;">Lausanne Darts</strong> — le premier vrai lieu dédié aux fléchettes en ville.
+          </p>
+
+          <p style="font-size: 15px; line-height: 1.6; color: #cfcfc5;">
+            On t'écrira dès l'ouverture :
+          </p>
+
+          <div style="margin: 20px 0; padding: 16px 20px; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; background: #141414; text-align: center;">
+            <div style="font-size: 11px; letter-spacing: 0.2em; color: #9a9a9a; text-transform: uppercase;">Opening</div>
+            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; margin-top: 4px;">1er août 2026</div>
+            <div style="font-size: 13px; color: #9a9a9a; margin-top: 6px;">Rue St-Martin 9, Lausanne</div>
+          </div>
+
+          <p style="font-size: 14px; line-height: 1.6; color: #cfcfc5;">
+            En attendant, teste ta précision sur notre mini-jeu — si tu fais un 180, c'est une partie offerte à l'ouverture 😉
+          </p>
+
+          <div style="text-align: center; margin: 24px 0;">
+            <a href="https://lausanne-darts.ch/jeu" style="display: inline-block; padding: 12px 24px; background: #E63946; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; letter-spacing: 0.05em;">
+              Jouer au mini-jeu
+            </a>
+          </div>
+
+          <p style="font-size: 13px; color: #9a9a9a; margin-top: 28px; text-align: center;">
+            À très vite,<br />
+            <strong style="color: #F0E6D2;">L'équipe Lausanne Darts</strong>
+          </p>
         </div>
       `,
     });
