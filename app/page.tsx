@@ -150,9 +150,12 @@ export default function Home() {
             ))}
           </nav>
 
-          <a className="header-cta" href="#contact">
-            Être prévenu
-          </a>
+          <div className="header-actions">
+            <a className="nav-link header-jeu" href="/jeu">🎯 Jeu</a>
+            <a className="header-cta" href="#contact">
+              Être prévenu
+            </a>
+          </div>
         </header>
 
         <section id="accueil" className="section-block hero-section">
