@@ -326,6 +326,52 @@ h1 {
   line-height: 0.9;
 }
 
+.hero-logo--mini {
+  font-family: var(--font-heading), 'Bebas Neue', sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+
+.hero-logo--mini .hero-logo-underline {
+  height: 2px;
+  margin-top: 0.04em;
+}
+
+.hero-logo--mini .hero-logo-underline::after {
+  width: 5px;
+  height: 5px;
+}
+
+.brand--logo {
+  text-decoration: none;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: 2px solid #E63946;
+  border-radius: 10px;
+}
+
+.brand-badge-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border: 2px solid #2D8B46;
+  border-radius: 6px;
+  font-family: var(--font-display), 'Outfit', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #F0E6D2;
+  line-height: 1;
+}
+
 .hero-logo-line {
   display: block;
   color: #F0E6D2;

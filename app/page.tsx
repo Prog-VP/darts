@@ -129,12 +129,9 @@ export default function Home() {
 
       <div className="page-shell">
         <header className="site-header">
-          <a className="brand" href="#accueil" aria-label="Aller à l’accueil">
-            <span className="brand-mark" aria-hidden="true">
-              LD
-            </span>
-            <span className="brand-copy">
-              <strong>Lausanne Darts</strong>
+          <a className="brand brand--logo" href="#accueil" aria-label="Aller à l’accueil">
+            <span className="brand-badge">
+              <span className="brand-badge-inner">LD</span>
             </span>
           </a>
 
