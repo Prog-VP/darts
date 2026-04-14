@@ -319,6 +319,46 @@ h1 {
   text-shadow: 0 0 24px rgba(230, 57, 70, 0.16);
 }
 
+.hero-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 0.9;
+}
+
+.hero-logo-line {
+  display: block;
+  color: #F0E6D2;
+}
+
+.hero-logo-line--darts {
+  padding-bottom: 0.2em;
+}
+
+.hero-logo-underline {
+  display: block;
+  height: 3px;
+  width: 100%;
+  margin-top: 0.06em;
+  border-radius: 2px;
+  position: relative;
+}
+
+.hero-logo-underline::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: inherit;
+}
+
+.hero-logo-underline--red { background: var(--red); }
+.hero-logo-underline--green { background: #2D8B46; margin-top: 0.04em; }
+
 .hero-lead {
   margin-top: 1.35rem;
   font-family: var(--font-display);

@@ -65,13 +65,35 @@ export default function InviteForm() {
       setFormData((current) => ({ ...current, [field]: event.target.value }));
     };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedFirstName = formData.prenom.trim();
 
-    setSubmittedFirstName(trimmedFirstName || "toi");
-    setFormData(INITIAL_FORM);
+    setSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch("/api/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        throw new Error("Envoi échoué");
+      }
+
+      setSubmittedFirstName(trimmedFirstName || "toi");
+      setFormData(INITIAL_FORM);
+    } catch (err) {
+      setErrorMessage("Oups, une erreur est survenue. Réessaie dans un instant.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -109,7 +131,13 @@ export default function InviteForm() {
           Un mail au lancement. Pas de spam.
         </p>
 
-        <button type="submit">S’inscrire</button>
+        <button type="submit" disabled={submitting}>
+          {submitting ? "Envoi…" : "S’inscrire"}
+        </button>
+
+        {errorMessage && (
+          <p className="form-error" role="alert">{errorMessage}</p>
+        )}
       </form>
 
       {submittedFirstName ? (

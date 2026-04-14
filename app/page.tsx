@@ -160,10 +160,13 @@ export default function Home() {
 
         <section id="accueil" className="section-block hero-section">
           <div className="hero-copy">
-            <h1>
-              Lausanne
-              <br />
-              <span className="accent">Darts</span>
+            <h1 className="hero-logo">
+              <span className="hero-logo-line">Lausanne</span>
+              <span className="hero-logo-line hero-logo-line--darts">
+                Darts
+                <span className="hero-logo-underline hero-logo-underline--red" />
+                <span className="hero-logo-underline hero-logo-underline--green" />
+              </span>
             </h1>
 
             <p className="hero-lead">
