@@ -61,19 +61,19 @@ export default function GamePage() {
     const x = rawX + Math.cos(angle) * magnitude;
     const y = rawY + Math.sin(angle) * magnitude;
     const { value, label } = getScore(x, y);
-    setDarts((prev) => {
-      const updated = [...prev, { x, y, score: value }];
-      if (updated.length === 3) {
-        const finalTotal = updated.reduce((s, d) => s + d.score, 0);
-        if (finalTotal > best) {
-          setBest(finalTotal);
-          window.localStorage.setItem(BEST_KEY, String(finalTotal));
-        }
-        setGamesPlayed((g) => g + 1);
-      }
-      return updated;
-    });
+    const newDart = { x, y, score: value };
+    const updated = [...darts, newDart];
+    setDarts(updated);
     setLastLabel(label);
+
+    if (updated.length === 3) {
+      const finalTotal = updated.reduce((s, d) => s + d.score, 0);
+      if (finalTotal > best) {
+        setBest(finalTotal);
+        window.localStorage.setItem(BEST_KEY, String(finalTotal));
+      }
+      setGamesPlayed((g) => g + 1);
+    }
   };
 
   const onClick = (e: ReactMouseEvent<SVGSVGElement>) => {
