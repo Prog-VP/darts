@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
+import { useState, useEffect, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
+
+const BEST_KEY = "lausanne-darts-best-score";
 
 type Dart = { x: number; y: number; score: number };
 
@@ -36,22 +38,41 @@ function getScore(x: number, y: number): { value: number; label: string } {
 
 export default function GamePage() {
   const [darts, setDarts] = useState<Dart[]>([]);
-  const [lastLabel, setLastLabel] = useState<string>("Vise le bullseye");
+  const [lastLabel, setLastLabel] = useState<string>("—");
+  const [best, setBest] = useState<number>(0);
+  const [gamesPlayed, setGamesPlayed] = useState<number>(0);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(BEST_KEY);
+    if (stored) setBest(Number(stored) || 0);
+  }, []);
 
   const throwDart = (clientX: number, clientY: number, rect: DOMRect) => {
     if (darts.length >= 3) return;
-    const scaleX = BOARD_SIZE / rect.width;
-    const scaleY = BOARD_SIZE / rect.height;
-    const rawX = (clientX - rect.left) * scaleX;
-    const rawY = (clientY - rect.top) * scaleY;
+    const scaleX = (BOARD_SIZE + 80) / rect.width;
+    const scaleY = (BOARD_SIZE + 80) / rect.height;
+    const rawX = (clientX - rect.left) * scaleX - 40;
+    const rawY = (clientY - rect.top) * scaleY - 40;
     const distFromCenter = Math.sqrt((rawX - CENTER) ** 2 + (rawY - CENTER) ** 2);
-    const jitter = 55 + distFromCenter * 0.25;
+    const skillFactor = Math.max(0, 1 - gamesPlayed * 0.05);
+    const jitter = (55 + distFromCenter * 0.25) * skillFactor;
     const angle = Math.random() * Math.PI * 2;
     const magnitude = Math.random() * jitter;
     const x = rawX + Math.cos(angle) * magnitude;
     const y = rawY + Math.sin(angle) * magnitude;
     const { value, label } = getScore(x, y);
-    setDarts((prev) => [...prev, { x, y, score: value }]);
+    setDarts((prev) => {
+      const updated = [...prev, { x, y, score: value }];
+      if (updated.length === 3) {
+        const finalTotal = updated.reduce((s, d) => s + d.score, 0);
+        if (finalTotal > best) {
+          setBest(finalTotal);
+          window.localStorage.setItem(BEST_KEY, String(finalTotal));
+        }
+        setGamesPlayed((g) => g + 1);
+      }
+      return updated;
+    });
     setLastLabel(label);
   };
 
@@ -69,7 +90,7 @@ export default function GamePage() {
 
   const reset = () => {
     setDarts([]);
-    setLastLabel("Vise le bullseye");
+    setLastLabel("—");
   };
 
   const total = darts.reduce((sum, d) => sum + d.score, 0);
@@ -97,6 +118,7 @@ export default function GamePage() {
         <a href="/" style={styles.back}>← Retour</a>
         <h1 style={styles.title}>Lancer de Fléchettes</h1>
         <p style={styles.sub}>Clique ou touche la cible — 3 fléchettes.</p>
+        <p style={styles.tip}>À ce qu&apos;il paraît, plus tu joues, plus tu t&apos;améliores…</p>
       </div>
 
       <div style={styles.scoreRow}>
@@ -112,10 +134,18 @@ export default function GamePage() {
           <span style={styles.scoreLabel}>Dernier</span>
           <span style={styles.scoreValueSmall}>{lastLabel}</span>
         </div>
+        <div style={styles.scoreBox}>
+          <span style={styles.scoreLabel}>Ton best score</span>
+          <span style={styles.scoreValue}>{best}</span>
+        </div>
+        <div style={styles.scoreBox}>
+          <span style={styles.scoreLabel}>Parties jouées</span>
+          <span style={styles.scoreValue}>{gamesPlayed}</span>
+        </div>
       </div>
 
       <svg
-        viewBox={`0 0 ${BOARD_SIZE} ${BOARD_SIZE}`}
+        viewBox={`-40 -40 ${BOARD_SIZE + 80} ${BOARD_SIZE + 80}`}
         style={styles.board}
         onClick={onClick}
         onTouchEnd={onTouch}
@@ -157,10 +187,69 @@ export default function GamePage() {
 
       {finished && (
         <div style={styles.endBox}>
-          <p style={styles.endText}>Partie terminée — {total} points</p>
+          {total === 180 ? (
+            <>
+              <div className="jeu-confetti" aria-hidden="true">
+                {Array.from({ length: 30 }).map((_, i) => (
+                  <span key={i} className="jeu-confetti-piece" style={{
+                    left: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 0.4}s`,
+                    background: ["#E63946", "#2D8B46", "#F0E6D2"][i % 3],
+                  }} />
+                ))}
+              </div>
+              <div className="jeu-prize">
+                <p style={styles.prizeTitle}>🎯 180 — PARTIE OFFERTE !</p>
+                <p style={styles.prizeText}>
+                  Screenshot cette page et montre-la à l&apos;ouverture avec ton code :
+                </p>
+                <p style={styles.promoCode}>BULLSEYE180</p>
+              </div>
+            </>
+          ) : (
+            <p style={styles.endText}>Partie terminée — {total} points</p>
+          )}
           <button onClick={reset} style={styles.button}>Rejouer</button>
         </div>
       )}
+
+      <style jsx global>{`
+        .jeu-prize {
+          padding: 1.2rem 1.6rem;
+          margin-bottom: 1rem;
+          border: 2px solid #E63946;
+          border-radius: 14px;
+          background: linear-gradient(180deg, rgba(230,57,70,0.18), rgba(45,139,70,0.12));
+          animation: jeu-prize-in 600ms cubic-bezier(0.2, 1.4, 0.4, 1) both, jeu-prize-glow 1.8s ease-in-out infinite alternate 600ms;
+        }
+        @keyframes jeu-prize-in {
+          0% { transform: scale(0.6) rotate(-4deg); opacity: 0; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes jeu-prize-glow {
+          from { box-shadow: 0 0 0 rgba(230, 57, 70, 0); }
+          to { box-shadow: 0 0 40px rgba(230, 57, 70, 0.6), 0 0 80px rgba(45, 139, 70, 0.35); }
+        }
+        .jeu-confetti {
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          overflow: hidden;
+          z-index: 50;
+        }
+        .jeu-confetti-piece {
+          position: absolute;
+          top: -20px;
+          width: 10px;
+          height: 14px;
+          border-radius: 2px;
+          animation: jeu-confetti-fall 2.4s ease-in forwards;
+        }
+        @keyframes jeu-confetti-fall {
+          0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg); opacity: 0.9; }
+        }
+      `}</style>
     </main>
   );
 }
@@ -206,6 +295,38 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
   },
   endText: { fontSize: "1.2rem", marginBottom: "0.8rem" },
+  prize: {
+    padding: "1.2rem 1.6rem",
+    marginBottom: "1rem",
+    border: "2px solid #E63946",
+    borderRadius: "14px",
+    background: "linear-gradient(180deg, rgba(230,57,70,0.15), rgba(45,139,70,0.1))",
+  },
+  prizeTitle: {
+    fontFamily: "var(--font-heading), 'Bebas Neue', sans-serif",
+    fontSize: "1.6rem",
+    margin: "0 0 0.5rem",
+    color: "#F0E6D2",
+    letterSpacing: "0.05em",
+  },
+  prizeText: { margin: 0, fontSize: "0.95rem", color: "#F0E6D2" },
+  promoCode: {
+    marginTop: "0.8rem",
+    fontFamily: "var(--font-heading), 'Bebas Neue', sans-serif",
+    fontSize: "1.8rem",
+    letterSpacing: "0.25em",
+    color: "#F0E6D2",
+    padding: "0.4rem 0.8rem",
+    border: "1.5px dashed #2D8B46",
+    borderRadius: "8px",
+    display: "inline-block",
+  },
+  tip: {
+    marginTop: "0.6rem",
+    fontSize: "0.8rem",
+    color: "#9a9a9a",
+    fontStyle: "italic",
+  },
   button: {
     padding: "0.7rem 1.6rem",
     border: "1px solid #E63946",
