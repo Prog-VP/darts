@@ -54,7 +54,7 @@ export default function GamePage() {
     const rawX = (clientX - rect.left) * scaleX - 40;
     const rawY = (clientY - rect.top) * scaleY - 40;
     const distFromCenter = Math.sqrt((rawX - CENTER) ** 2 + (rawY - CENTER) ** 2);
-    const skillFactor = Math.max(0, 1 - gamesPlayed * 0.05);
+    const skillFactor = Math.max(0, 1 - gamesPlayed * 0.01);
     const jitter = (55 + distFromCenter * 0.25) * skillFactor;
     const angle = Math.random() * Math.PI * 2;
     const magnitude = Math.random() * jitter;
