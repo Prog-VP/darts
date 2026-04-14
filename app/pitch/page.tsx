@@ -32,7 +32,7 @@ type Slide = {
   columns?: { label: string; value: string }[];
   press?: { quote: string; source: string; date: string }[];
   offers?: { name: string; price: string; perks: string[] }[];
-  contact?: { address: string; email: string; team?: { name: string; role: string; desc: string; fun: string }[] };
+  contact?: { address: string; email: string; team?: { name: string; role?: string; desc: string; fun: string }[] };
 };
 
 const SLIDES: Slide[] = [
