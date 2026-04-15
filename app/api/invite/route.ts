@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const CONTACT_EMAIL = process.env.SMTP_USER ?? "contact@lausanne-darts.ch";
+const CONTACT_EMAIL = "contact@lausanne-darts.ch";
+const FROM = `Lausanne Darts <${CONTACT_EMAIL}>`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,33 +12,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Champs manquants" }, { status: 400 });
     }
 
-    const host = process.env.SMTP_HOST;
-    const port = Number(process.env.SMTP_PORT ?? 465);
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
-
-    if (!host || !user || !pass) {
-      console.error("Config SMTP manquante");
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error("RESEND_API_KEY manquante");
       return NextResponse.json(
         { error: "Configuration serveur incomplète" },
         { status: 500 }
       );
     }
 
-    const transporter = nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: { user, pass },
-    });
+    const resend = new Resend(apiKey);
 
-    // 1. Notification interne
-    await transporter.sendMail({
-      from: `"Lausanne Darts" <${CONTACT_EMAIL}>`,
+    await resend.emails.send({
+      from: FROM,
       to: CONTACT_EMAIL,
       replyTo: email,
       subject: `Nouvelle inscription — ${prenom} ${nom}`,
-      text: `Prénom : ${prenom}\nNom : ${nom}\nEmail : ${email}`,
       html: `
         <div style="font-family: sans-serif; color: #222;">
           <h2 style="margin:0 0 12px">Nouvelle inscription</h2>
@@ -48,12 +38,11 @@ export async function POST(request: NextRequest) {
       `,
     });
 
-    // 2. Confirmation envoyée au visiteur
-    await transporter.sendMail({
-      from: `"Lausanne Darts" <${CONTACT_EMAIL}>`,
+    await resend.emails.send({
+      from: FROM,
       to: email,
       subject: "Merci pour ton inscription — Lausanne Darts 🎯",
-      text: `Hello ${prenom},\n\nMerci pour ton inscription — on est ravis de te compter parmi les premiers à suivre l'aventure Lausanne Darts.\n\nOn t'écrira au lancement, le 1er août 2026.\nRue St-Martin 9, Lausanne.\n\nEn attendant, si tu veux tester ta précision : lausanne-darts.ch/jeu (un 180 = une partie offerte à l'ouverture 😉).\n\nÀ très vite,\nL'équipe Lausanne Darts`,
+      text: `Hello ${prenom},\n\nMerci pour ton inscription — on est ravis de te compter parmi les premiers à suivre l'aventure Lausanne Darts.\n\nOn t'écrira au lancement, le 1er août 2026.\nRue St-Martin 9, Lausanne.\n\nÀ très vite,\nL'équipe Lausanne Darts`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a1a; max-width: 560px; margin: 0 auto; padding: 32px 28px; background: #0a0a0a; color: #F0E6D2; border-radius: 12px;">
           <div style="text-align: center; margin-bottom: 24px;">
@@ -81,16 +70,6 @@ export async function POST(request: NextRequest) {
             <div style="font-size: 11px; letter-spacing: 0.2em; color: #9a9a9a; text-transform: uppercase;">Opening</div>
             <div style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; margin-top: 4px;">1er août 2026</div>
             <div style="font-size: 13px; color: #9a9a9a; margin-top: 6px;">Rue St-Martin 9, Lausanne</div>
-          </div>
-
-          <p style="font-size: 14px; line-height: 1.6; color: #cfcfc5;">
-            En attendant, teste ta précision sur notre mini-jeu — si tu fais un 180, c'est une partie offerte à l'ouverture 😉
-          </p>
-
-          <div style="text-align: center; margin: 24px 0;">
-            <a href="https://lausanne-darts.ch/jeu" style="display: inline-block; padding: 12px 24px; background: #E63946; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; letter-spacing: 0.05em;">
-              Jouer au mini-jeu
-            </a>
           </div>
 
           <p style="font-size: 13px; color: #9a9a9a; margin-top: 28px; text-align: center;">
