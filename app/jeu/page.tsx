@@ -38,6 +38,42 @@ function getScore(x: number, y: number): { value: number; label: string; zone: Z
   return { value: base, label: `${base}`, zone: "single" };
 }
 
+function suggestCheckout(n: number): string[] | null {
+  if (n < 2 || n > 170) return null;
+  const endOut = (r: number): string | null => {
+    if (r === 50) return "Bull";
+    if (r >= 2 && r <= 40 && r % 2 === 0) return `D${r / 2}`;
+    return null;
+  };
+  const oneDart = endOut(n);
+  if (oneDart) return [oneDart];
+
+  for (let t = 20; t >= 1; t--) {
+    const f = endOut(n - t * 3);
+    if (f) return [`T${t}`, f];
+  }
+  for (let s = 20; s >= 1; s--) {
+    const f = endOut(n - s);
+    if (f) return [`${s}`, f];
+  }
+  const bullFirst = endOut(n - 25);
+  if (bullFirst) return ["25", bullFirst];
+
+  for (const t1 of [20, 19, 18, 17, 16, 15]) {
+    const after1 = n - t1 * 3;
+    if (after1 < 2) continue;
+    for (let t2 = 20; t2 >= 1; t2--) {
+      const f = endOut(after1 - t2 * 3);
+      if (f) return [`T${t1}`, `T${t2}`, f];
+    }
+    for (let s = 20; s >= 1; s--) {
+      const f = endOut(after1 - s);
+      if (f) return [`T${t1}`, `${s}`, f];
+    }
+  }
+  return null;
+}
+
 export default function GamePage() {
   const [remaining, setRemaining] = useState<number>(STARTING_SCORE);
   const [visitDarts, setVisitDarts] = useState<Dart[]>([]);
@@ -48,6 +84,7 @@ export default function GamePage() {
   const [won, setWon] = useState<boolean>(false);
   const [bestDarts, setBestDarts] = useState<number | null>(null);
   const [gamesPlayed, setGamesPlayed] = useState<number>(0);
+  const [lastVisitScore, setLastVisitScore] = useState<number>(0);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(BEST_DARTS_KEY);
@@ -89,6 +126,7 @@ export default function GamePage() {
     if (isWin) {
       setRemaining(0);
       setVisitDarts(updatedVisit);
+      setLastVisitScore(updatedVisit.reduce((s, d) => s + d.score, 0));
       setWon(true);
       setGamesPlayed((g) => g + 1);
       if (bestDarts === null || newTotal < bestDarts) {
@@ -101,6 +139,7 @@ export default function GamePage() {
     if (isBust) {
       setVisitDarts(updatedVisit);
       setBust(true);
+      setLastVisitScore(0);
       window.setTimeout(() => {
         setRemaining(visitStartScore);
         setVisitDarts([]);
@@ -113,6 +152,7 @@ export default function GamePage() {
     if (updatedVisit.length === 3) {
       setVisitStartScore(potential);
       setVisitDarts(updatedVisit);
+      setLastVisitScore(updatedVisit.reduce((s, d) => s + d.score, 0));
       window.setTimeout(() => setVisitDarts([]), 900);
     } else {
       setVisitDarts(updatedVisit);
@@ -132,7 +172,13 @@ export default function GamePage() {
     setLastLabel("—");
     setBust(false);
     setWon(false);
+    setLastVisitScore(0);
   };
+
+  const scored = STARTING_SCORE - remaining;
+  const ppr = totalDarts === 0 ? 0 : (scored / totalDarts) * 3;
+  const visitScoreLive = visitDarts.reduce((s, d) => s + d.score, 0);
+  const checkout = suggestCheckout(remaining);
 
   const wedges = Array.from({ length: 20 }).map((_, i) => {
     const startAngle = -99 + i * 18;
@@ -158,26 +204,57 @@ export default function GamePage() {
         <p style={styles.sub} className="jeu-sub">Commence direct, finis sur un double.</p>
       </div>
 
-      <div className="jeu-stat-bar">
-        <div className="jeu-stat jeu-stat--primary">
-          <span className="jeu-stat-label">Restant</span>
-          <span className="jeu-stat-value jeu-stat-value--big">{remaining}</span>
+      <div className="jeu-panel">
+        <div className="jeu-visit-row">
+          {[0, 1, 2].map((i) => {
+            const d = visitDarts[i];
+            return (
+              <div key={i} className={`jeu-visit-slot ${d ? "is-filled" : ""}`}>
+                {d ? d.label : "—"}
+              </div>
+            );
+          })}
         </div>
-        <div className="jeu-stat">
-          <span className="jeu-stat-label">Darts</span>
-          <span className="jeu-stat-value">{totalDarts}</span>
+
+        {checkout && !won && (
+          <div className="jeu-checkout">
+            <span className="jeu-checkout-label">Checkout</span>
+            <span className="jeu-checkout-route">
+              {checkout.map((c, i) => (
+                <span key={i} className="jeu-checkout-step">{c}</span>
+              ))}
+            </span>
+          </div>
+        )}
+
+        <div className="jeu-score-main">
+          <div className="jeu-score-side">
+            <span className="jeu-score-prev">{visitStartScore}</span>
+            <span className="jeu-score-delta">
+              {visitDarts.length > 0 ? `−${visitScoreLive}` : ""}
+            </span>
+            <span className="jeu-score-player">V1NCENT_P</span>
+          </div>
+          <div className="jeu-score-big">{remaining}</div>
         </div>
-        <div className="jeu-stat">
-          <span className="jeu-stat-label">Dernier</span>
-          <span className="jeu-stat-value jeu-stat-value--sm">{lastLabel}</span>
-        </div>
-        <div className="jeu-stat">
-          <span className="jeu-stat-label">Best</span>
-          <span className="jeu-stat-value">{bestDarts ?? "—"}</span>
-        </div>
-        <div className="jeu-stat">
-          <span className="jeu-stat-label">Parties</span>
-          <span className="jeu-stat-value">{gamesPlayed}</span>
+
+        <div className="jeu-score-footer">
+          <div className="jeu-foot-item">
+            <span>PPR</span>
+            <strong>{ppr.toFixed(1)}</strong>
+          </div>
+          <div className="jeu-foot-item">
+            <span>Dernière volée</span>
+            <strong>{lastVisitScore}</strong>
+          </div>
+          <div className="jeu-foot-item">
+            <span>Darts</span>
+            <strong>{totalDarts}</strong>
+          </div>
+          <div className="jeu-foot-item">
+            <span>Best</span>
+            <strong>{bestDarts ?? "—"}</strong>
+          </div>
         </div>
       </div>
 
@@ -279,66 +356,160 @@ export default function GamePage() {
           scroll-behavior: smooth;
         }
 
-        .jeu-stat-bar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 0.35rem;
+        .jeu-panel {
           width: 100%;
           max-width: 520px;
-          padding: 0.7rem 0.9rem;
+          margin-bottom: 0.85rem;
           border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 12px;
+          border-radius: 14px;
           background: #141414;
-          margin-bottom: 1rem;
+          overflow: hidden;
         }
 
-        .jeu-stat {
+        .jeu-visit-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0.5rem;
+          padding: 0.6rem;
+          background: rgba(240, 230, 210, 0.03);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .jeu-visit-slot {
+          display: grid;
+          place-items: center;
+          padding: 0.55rem 0.4rem;
+          border-radius: 8px;
+          background: #1e1e1e;
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: 1.1rem;
+          letter-spacing: 0.04em;
+          color: rgba(154, 154, 154, 0.7);
+          min-height: 40px;
+        }
+
+        .jeu-visit-slot.is-filled {
+          color: #F0E6D2;
+          background: #2a2a2a;
+          border-color: rgba(230, 57, 70, 0.3);
+        }
+
+        .jeu-checkout {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          padding: 0.55rem 0.8rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          background: rgba(244, 160, 36, 0.06);
+        }
+
+        .jeu-checkout-label {
+          font-size: 0.62rem;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #F4A024;
+        }
+
+        .jeu-checkout-route {
+          display: flex;
+          gap: 0.35rem;
+          flex-wrap: wrap;
+        }
+
+        .jeu-checkout-step {
+          padding: 0.15rem 0.55rem;
+          border-radius: 999px;
+          background: rgba(244, 160, 36, 0.14);
+          border: 1px solid rgba(244, 160, 36, 0.3);
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: 0.92rem;
+          color: #F0E6D2;
+          letter-spacing: 0.04em;
+        }
+
+        .jeu-score-main {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          align-items: center;
+          gap: 0.8rem;
+          padding: 1rem 1.1rem;
+        }
+
+        .jeu-score-side {
+          display: flex;
+          flex-direction: column;
+          gap: 0.1rem;
+          min-width: 0;
+        }
+
+        .jeu-score-prev {
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: 1rem;
+          color: #9a9a9a;
+          text-decoration: line-through;
+          letter-spacing: 0.02em;
+        }
+
+        .jeu-score-delta {
+          min-height: 1.1rem;
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: 1.15rem;
+          color: #E63946;
+          letter-spacing: 0.02em;
+        }
+
+        .jeu-score-player {
+          margin-top: 0.2rem;
+          font-size: 0.68rem;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #9a9a9a;
+        }
+
+        .jeu-score-big {
+          justify-self: end;
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: clamp(3.4rem, 14vw, 5.4rem);
+          line-height: 0.95;
+          color: #F0E6D2;
+          letter-spacing: 0.01em;
+        }
+
+        .jeu-score-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          gap: 0.5rem;
+          padding: 0.6rem 0.8rem;
+          background: #0f0f0f;
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .jeu-foot-item {
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
+          gap: 0.15rem;
           min-width: 0;
-          flex: 1 1 0;
         }
 
-        .jeu-stat--primary {
-          flex: 1.6 1 0;
-          border-right: 1px solid rgba(255, 255, 255, 0.08);
-          padding-right: 0.6rem;
-        }
-
-        .jeu-stat-label {
+        .jeu-foot-item span {
           font-size: 0.58rem;
           color: #9a9a9a;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          line-height: 1;
-        }
-
-        .jeu-stat-value {
-          font-family: var(--font-heading), "Bebas Neue", sans-serif;
-          font-size: 1.25rem;
-          line-height: 1.1;
-          margin-top: 0.2rem;
-          letter-spacing: 0.02em;
           white-space: nowrap;
         }
 
-        .jeu-stat-value--big {
-          font-size: 1.9rem;
-          color: #E63946;
-          text-shadow: 0 0 16px rgba(230, 57, 70, 0.35);
-        }
-
-        .jeu-stat-value--sm {
-          font-family: var(--font-display), "Outfit", sans-serif;
-          font-size: 0.78rem;
-          font-weight: 600;
-          letter-spacing: 0;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 100%;
+        .jeu-foot-item strong {
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: 1.1rem;
+          font-weight: 400;
+          color: #F0E6D2;
+          letter-spacing: 0.02em;
         }
 
         .jeu-bust {
@@ -494,30 +665,47 @@ export default function GamePage() {
             display: none;
           }
 
-          .jeu-stat-bar {
-            padding: 0.55rem 0.6rem;
-            gap: 0.2rem;
-            margin-bottom: 0.8rem;
+          .jeu-panel {
+            margin-bottom: 0.7rem;
           }
 
-          .jeu-stat-label {
+          .jeu-visit-slot {
+            font-size: 1rem;
+            min-height: 34px;
+            padding: 0.4rem 0.3rem;
+          }
+
+          .jeu-checkout-label {
+            font-size: 0.55rem;
+          }
+
+          .jeu-checkout-step {
+            font-size: 0.82rem;
+          }
+
+          .jeu-score-main {
+            padding: 0.8rem 0.9rem;
+            gap: 0.6rem;
+          }
+
+          .jeu-score-big {
+            font-size: clamp(3rem, 16vw, 4.5rem);
+          }
+
+          .jeu-score-prev {
+            font-size: 0.9rem;
+          }
+
+          .jeu-score-delta {
+            font-size: 1rem;
+          }
+
+          .jeu-foot-item span {
             font-size: 0.52rem;
           }
 
-          .jeu-stat-value {
-            font-size: 1.05rem;
-          }
-
-          .jeu-stat-value--big {
-            font-size: 1.5rem;
-          }
-
-          .jeu-stat-value--sm {
-            font-size: 0.7rem;
-          }
-
-          .jeu-stat--primary {
-            padding-right: 0.4rem;
+          .jeu-foot-item strong {
+            font-size: 0.95rem;
           }
 
           .jeu-board {
