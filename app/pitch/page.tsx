@@ -374,6 +374,15 @@ export default function PitchPage() {
             &rarr;
           </button>
         </div>
+
+        <a
+          className="pitch-download"
+          href="/pitch-lausanne-darts.pdf"
+          download
+          aria-label="Télécharger le pitch en PDF"
+        >
+          <span aria-hidden="true">&darr;</span> Télécharger le PDF
+        </a>
       </div>
 
       <style jsx>{`
@@ -1176,6 +1185,32 @@ export default function PitchPage() {
           align-items: center;
           gap: 1.5rem;
           margin-top: 3.5rem;
+        }
+
+        .pitch-download {
+          margin-top: 1.5rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.6rem 1.1rem;
+          border: 1px solid var(--border);
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.02);
+          color: var(--text-muted);
+          font-family: var(--font-pitch);
+          font-size: 0.8rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          text-decoration: none;
+          backdrop-filter: blur(8px);
+          transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pitch-download:hover {
+          color: var(--text);
+          border-color: var(--border-strong);
+          background: rgba(255, 255, 255, 0.05);
         }
 
         .pitch-nav-btn {

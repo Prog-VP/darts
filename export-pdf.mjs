@@ -40,30 +40,6 @@ async function exportBrochure() {
     overflow: hidden;
   }
 
-  .slide::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at top left, rgba(230, 57, 70, 0.08), transparent 40%),
-      radial-gradient(circle at 85% 18%, rgba(244, 160, 36, 0.05), transparent 30%),
-      radial-gradient(circle at 50% 100%, rgba(255, 214, 102, 0.04), transparent 35%);
-    pointer-events: none;
-  }
-
-  .slide::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: 0.08;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 80px 80px;
-    mask-image: radial-gradient(circle, black, transparent 80%);
-    pointer-events: none;
-  }
-
   .slide > * { position: relative; z-index: 1; }
 
   .tag {
@@ -177,7 +153,7 @@ async function exportBrochure() {
     width: 60px;
     height: 1px;
     margin: 16px auto 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+    background: rgba(255,255,255,0.14);
   }
 
   .cover-tagline {
@@ -241,17 +217,17 @@ async function exportBrochure() {
     padding: 18px 20px;
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 40%), rgba(17,17,17,0.78);
+    background: #111111;
     text-align: left;
   }
 
   .card--red {
-    background: linear-gradient(180deg, rgba(230,57,70,0.06), transparent 40%), rgba(230,57,70,0.04);
+    background: rgba(230,57,70,0.06);
     border-color: rgba(230,57,70,0.18);
   }
 
   .card--green {
-    background: linear-gradient(180deg, rgba(45,139,70,0.06), transparent 40%), rgba(45,139,70,0.04);
+    background: rgba(45,139,70,0.06);
     border-color: rgba(45,139,70,0.18);
   }
 
@@ -322,13 +298,13 @@ async function exportBrochure() {
     padding: 22px 20px;
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 40%), rgba(17,17,17,0.78);
+    background: #111111;
     text-align: left;
   }
 
   .offer--premium {
     border-color: rgba(244,160,36,0.3);
-    background: linear-gradient(180deg, rgba(244,160,36,0.06), transparent 40%), rgba(244,160,36,0.03);
+    background: rgba(244,160,36,0.06);
   }
 
   .offer-name {
@@ -382,7 +358,7 @@ async function exportBrochure() {
     padding: 20px;
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 40%), rgba(17,17,17,0.78);
+    background: #111111;
     text-align: center;
   }
 
