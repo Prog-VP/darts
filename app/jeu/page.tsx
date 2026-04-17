@@ -155,7 +155,7 @@ export default function GamePage() {
       <div style={styles.header} className="jeu-header">
         <a href="/" style={styles.back} className="jeu-back">← Retour</a>
         <h1 style={styles.title} className="jeu-title">501 SIDO</h1>
-        <p style={styles.sub} className="jeu-sub">Commence direct, finis sur un double. 9 darts ou moins = partie offerte.</p>
+        <p style={styles.sub} className="jeu-sub">Commence direct, finis sur un double.</p>
       </div>
 
       <div className="jeu-stat-bar">
