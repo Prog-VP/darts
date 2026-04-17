@@ -9,3 +9,9 @@ node_modules/
 
 # secrets
 RECOVERY-CODES-*.txt
+
+# generated video output
+remotion/out/
+
+# stray root-level pdf (use public/ instead)
+/lausanne-darts.pdf
