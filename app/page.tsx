@@ -46,7 +46,7 @@ const FEATURE_CARDS = [
 const FAQ_ITEMS = [
   {
     question: "Où ?",
-    answer: "Lausanne, centre-ville. Le lieu exact sera dévoilé bientôt.",
+    answer: "Rue St-Martin 9, 1003 Lausanne.",
   },
   {
     question: "Quand ?",
@@ -320,7 +320,7 @@ export default function Home() {
         <section id="lieu" className="section-block">
           <div className="section-heading">
             <h2 className="section-title">Le lieu</h2>
-            <p className="section-meta">Centre-ville de Lausanne.</p>
+            <p className="section-meta">Rue St-Martin 9, Lausanne.</p>
           </div>
 
           <div className="feature-grid">
