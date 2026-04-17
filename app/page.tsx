@@ -86,6 +86,7 @@ export default function Home() {
   const [countdown, setCountdown] = useState<Countdown>(EMPTY_COUNTDOWN);
   const [countdownReady, setCountdownReady] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>("accueil");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     setCountdown(getCountdown(OPENING_DATE));
@@ -123,6 +124,27 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setMenuOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <main className="page">
       <ThreeBackground />
@@ -156,7 +178,83 @@ export default function Home() {
               Être prévenu
             </a>
           </div>
+
+          <button
+            type="button"
+            className="menu-toggle"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Ouvrir le menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-drawer"
+          >
+            <span className="menu-toggle-bar" />
+            <span className="menu-toggle-bar" />
+            <span className="menu-toggle-bar" />
+          </button>
         </header>
+
+        <div
+          className={`drawer-backdrop ${menuOpen ? "is-open" : ""}`}
+          onClick={closeMenu}
+          aria-hidden="true"
+        />
+
+        <aside
+          id="mobile-drawer"
+          className={`drawer ${menuOpen ? "is-open" : ""}`}
+          aria-hidden={!menuOpen}
+          aria-label="Menu de navigation"
+        >
+          <div className="drawer-header">
+            <span className="brand-badge" aria-hidden="true">
+              <span className="brand-badge-inner">LD</span>
+            </span>
+            <button
+              type="button"
+              className="drawer-close"
+              onClick={closeMenu}
+              aria-label="Fermer le menu"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+
+          <nav className="drawer-nav" aria-label="Navigation mobile">
+            {SECTION_LINKS.map((section) => (
+              <a
+                key={section.id}
+                className={`drawer-link ${
+                  activeSection === section.id ? "is-active" : ""
+                }`}
+                href={`#${section.id}`}
+                onClick={closeMenu}
+                aria-current={activeSection === section.id ? "page" : undefined}
+              >
+                {section.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="drawer-footer">
+            <a
+              href="/jeu"
+              className="drawer-link drawer-link--jeu"
+              onClick={closeMenu}
+            >
+              <span aria-hidden="true">🎯</span> Jeu
+            </a>
+            <a
+              href="#contact"
+              className="drawer-cta"
+              onClick={closeMenu}
+            >
+              Être prévenu
+            </a>
+            <p className="drawer-meta">
+              Opening · 1<sup>er</sup> août 2026
+            </p>
+          </div>
+        </aside>
 
         <section id="accueil" className="section-block hero-section">
           <div className="hero-copy">
