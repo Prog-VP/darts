@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
+import { useState, useEffect, useRef, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
 
 const BEST_KEY = "lausanne-darts-best-score";
 
@@ -41,11 +41,22 @@ export default function GamePage() {
   const [lastLabel, setLastLabel] = useState<string>("—");
   const [best, setBest] = useState<number>(0);
   const [gamesPlayed, setGamesPlayed] = useState<number>(0);
+  const endBoxRef = useRef<HTMLDivElement | null>(null);
+  const boardRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(BEST_KEY);
     if (stored) setBest(Number(stored) || 0);
   }, []);
+
+  useEffect(() => {
+    if (darts.length === 3) {
+      const id = window.setTimeout(() => {
+        endBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 180);
+      return () => window.clearTimeout(id);
+    }
+  }, [darts.length]);
 
   const throwDart = (clientX: number, clientY: number, rect: DOMRect) => {
     if (darts.length >= 3) return;
@@ -91,6 +102,9 @@ export default function GamePage() {
   const reset = () => {
     setDarts([]);
     setLastLabel("—");
+    window.setTimeout(() => {
+      boardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
   };
 
   const total = darts.reduce((sum, d) => sum + d.score, 0);
@@ -113,40 +127,42 @@ export default function GamePage() {
   };
 
   return (
-    <main style={styles.main}>
-      <div style={styles.header}>
-        <a href="/" style={styles.back}>← Retour</a>
-        <h1 style={styles.title}>Lancer de Fléchettes</h1>
-        <p style={styles.sub}>Clique ou touche la cible — 3 fléchettes.</p>
-        <p style={styles.tip}>À ce qu&apos;il paraît, plus tu joues, plus tu t&apos;améliores…</p>
+    <main style={styles.main} className="jeu-main">
+      <div style={styles.header} className="jeu-header">
+        <a href="/" style={styles.back} className="jeu-back">← Retour</a>
+        <h1 style={styles.title} className="jeu-title">Lancer de Fléchettes</h1>
+        <p style={styles.sub} className="jeu-sub">Clique ou touche la cible — 3 fléchettes.</p>
+        <p style={styles.tip} className="jeu-tip">À ce qu&apos;il paraît, plus tu joues, plus tu t&apos;améliores…</p>
       </div>
 
-      <div style={styles.scoreRow}>
-        <div style={styles.scoreBox}>
+      <div style={styles.scoreRow} className="jeu-score-row">
+        <div style={styles.scoreBox} className="jeu-score-box">
           <span style={styles.scoreLabel}>Total</span>
           <span style={styles.scoreValue}>{total}</span>
         </div>
-        <div style={styles.scoreBox}>
+        <div style={styles.scoreBox} className="jeu-score-box">
           <span style={styles.scoreLabel}>Fléchettes</span>
           <span style={styles.scoreValue}>{darts.length} / 3</span>
         </div>
-        <div style={styles.scoreBox}>
+        <div style={styles.scoreBox} className="jeu-score-box">
           <span style={styles.scoreLabel}>Dernier</span>
           <span style={styles.scoreValueSmall}>{lastLabel}</span>
         </div>
-        <div style={styles.scoreBox}>
-          <span style={styles.scoreLabel}>Ton best score</span>
+        <div style={styles.scoreBox} className="jeu-score-box">
+          <span style={styles.scoreLabel}>Best</span>
           <span style={styles.scoreValue}>{best}</span>
         </div>
-        <div style={styles.scoreBox}>
-          <span style={styles.scoreLabel}>Parties jouées</span>
+        <div style={styles.scoreBox} className="jeu-score-box jeu-score-box--wide">
+          <span style={styles.scoreLabel}>Parties</span>
           <span style={styles.scoreValue}>{gamesPlayed}</span>
         </div>
       </div>
 
       <svg
+        ref={boardRef}
         viewBox={`-40 -40 ${BOARD_SIZE + 80} ${BOARD_SIZE + 80}`}
         style={styles.board}
+        className="jeu-board"
         onClick={onClick}
         onTouchEnd={onTouch}
       >
@@ -186,7 +202,7 @@ export default function GamePage() {
       </svg>
 
       {finished && (
-        <div style={styles.endBox}>
+        <div ref={endBoxRef} style={styles.endBox} className="jeu-end-box">
           {total === 180 ? (
             <>
               <div className="jeu-confetti" aria-hidden="true">
@@ -214,6 +230,69 @@ export default function GamePage() {
       )}
 
       <style jsx global>{`
+        html {
+          scroll-behavior: smooth;
+        }
+
+        .jeu-end-box {
+          scroll-margin-top: 2rem;
+          scroll-margin-bottom: 2rem;
+        }
+
+        @media (max-width: 640px) {
+          .jeu-main {
+            padding: 1rem 0.75rem !important;
+            padding-top: calc(1rem + env(safe-area-inset-top)) !important;
+            padding-bottom: calc(2rem + env(safe-area-inset-bottom)) !important;
+          }
+
+          .jeu-back {
+            position: static !important;
+            align-self: flex-start;
+            margin-bottom: 0.4rem;
+          }
+
+          .jeu-header {
+            width: 100%;
+            margin-bottom: 0.75rem !important;
+          }
+
+          .jeu-title {
+            font-size: 1.5rem !important;
+          }
+
+          .jeu-sub {
+            font-size: 0.82rem !important;
+          }
+
+          .jeu-tip {
+            display: none;
+          }
+
+          .jeu-score-row {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 0.5rem !important;
+            width: 100%;
+            max-width: 420px;
+            margin-bottom: 0.85rem !important;
+          }
+
+          .jeu-score-box {
+            min-width: 0 !important;
+            padding: 0.5rem 0.8rem !important;
+          }
+
+          .jeu-score-box--wide {
+            grid-column: span 2;
+          }
+
+          .jeu-board {
+            width: min(100vw - 1.5rem, 520px) !important;
+            margin-bottom: 0.5rem;
+          }
+        }
+
         .jeu-prize {
           padding: 1.2rem 1.6rem;
           margin-bottom: 1rem;
