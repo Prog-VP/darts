@@ -15,9 +15,3 @@ remotion/out/
 
 # stray root-level pdf (use public/ instead)
 /lausanne-darts.pdf
-
-# TS build cache
-tsconfig.tsbuildinfo
-
-# reveal gif source (Veo export, heavy)
-/whisk.gif
