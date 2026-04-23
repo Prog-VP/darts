@@ -627,11 +627,112 @@ h1 {
 .hero-logo-line {
   display: block;
   color: var(--cream);
+  white-space: nowrap;
 }
 
 .hero-logo-line--darts {
   padding-bottom: 0.2em;
   color: var(--red);
+}
+
+.hero-a {
+  position: relative;
+  display: inline-block;
+  line-height: 0.92;
+  vertical-align: top;
+}
+
+.hero-a-base {
+  display: inline-block;
+  line-height: 0.92;
+}
+
+.hero-a--target .hero-a-base {
+  display: inline-block;
+  animation: hero-a-target 3.6s infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes hero-a-target {
+  0%, 30% {
+    transform: translateY(0);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.65, 1);
+  }
+  40% {
+    transform: translateY(70%);
+    opacity: 0;
+    animation-timing-function: steps(1, end);
+  }
+  78% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  88%, 100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-a--target .hero-a-base {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.hero-a-drop {
+  --drop-x: 0.15em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  line-height: 0.92;
+  pointer-events: none;
+  user-select: none;
+  animation: hero-a-fall 3.6s infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes hero-a-fall {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+    animation-timing-function: ease-out;
+  }
+  6% {
+    transform: translate(0, 0);
+    opacity: 1;
+    animation-timing-function: steps(1, end);
+  }
+  20% {
+    transform: translate(0, 0);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.65, 1);
+  }
+  40% {
+    transform: translate(var(--drop-x), 108%);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.4, 1);
+  }
+  46% {
+    transform: translate(var(--drop-x), 96%);
+  }
+  52%, 65% {
+    transform: translate(var(--drop-x), 100%);
+    opacity: 1;
+    animation-timing-function: ease-in;
+  }
+  78%, 100% {
+    transform: translate(var(--drop-x), 100%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-a-drop {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 .hero-logo-underline {

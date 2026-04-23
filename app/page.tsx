@@ -259,9 +259,20 @@ export default function Home() {
         <section id="accueil" className="section-block hero-section">
           <div className="hero-copy">
             <h1 className="hero-logo">
-              <span className="hero-logo-line">Lausanne</span>
+              <span className="hero-logo-line">
+                {"L"}
+                <span className="hero-a">
+                  <span className="hero-a-base">A</span>
+                  <span className="hero-a-drop" aria-hidden="true">A</span>
+                </span>
+                {"usanne"}
+              </span>
               <span className="hero-logo-line hero-logo-line--darts">
-                Darts
+                {"D"}
+                <span className="hero-a hero-a--target">
+                  <span className="hero-a-base">A</span>
+                </span>
+                {"rts"}
                 <span className="hero-logo-underline hero-logo-underline--red" />
                 <span className="hero-logo-underline hero-logo-underline--green" />
               </span>
