@@ -28,9 +28,9 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://lausanne-darts.ch"),
   title: "Lausanne Darts | Le spot fléchettes de Lausanne",
   description:
-    "Ouverture le 1er août 2026 — Espace dédié aux fléchettes à Lausanne. Pistes connectées, privatisation.",
+    "Ouverture cet automne — Espace dédié aux fléchettes à Lausanne. Pistes connectées, privatisation.",
   openGraph: {
-    title: "Lausanne Darts | Ouverture 1er août 2026",
+    title: "Lausanne Darts | Ouverture cet automne",
     description:
       "Espace dédié aux fléchettes à Lausanne. Pistes connectées, privatisation.",
     url: "https://lausanne-darts.ch",

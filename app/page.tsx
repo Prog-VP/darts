@@ -4,22 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import InviteForm from "./components/InviteForm";
 
-type Countdown = {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-};
-
 type SectionId = "accueil" | "lieu" | "faq" | "contact";
-
-const OPENING_DATE = "2026-08-01T00:00:00+02:00";
-const EMPTY_COUNTDOWN: Countdown = {
-  days: 0,
-  hours: 0,
-  minutes: 0,
-  seconds: 0,
-};
 
 const ThreeBackground = dynamic(() => import("./ThreeBackground"), {
   ssr: false,
@@ -50,7 +35,8 @@ const FAQ_ITEMS = [
   },
   {
     question: "Quand ?",
-    answer: "Tous les jours, dès le 1er août 2026.",
+    answer:
+      "Pas encore de date d’ouverture. Le projet prend un peu plus de temps que prévu : on se retrouve cet automne pour la suite.",
   },
   {
     question: "Pour qui ?",
@@ -67,37 +53,9 @@ const FAQ_ITEMS = [
   },
 ] as const;
 
-function getCountdown(target: string): Countdown {
-  const total = Math.max(0, new Date(target).getTime() - Date.now());
-
-  return {
-    days: Math.floor(total / (1000 * 60 * 60 * 24)),
-    hours: Math.floor((total / (1000 * 60 * 60)) % 24),
-    minutes: Math.floor((total / (1000 * 60)) % 60),
-    seconds: Math.floor((total / 1000) % 60),
-  };
-}
-
-function formatUnit(value: number, minimumDigits = 2) {
-  return value.toString().padStart(minimumDigits, "0");
-}
-
 export default function Home() {
-  const [countdown, setCountdown] = useState<Countdown>(EMPTY_COUNTDOWN);
-  const [countdownReady, setCountdownReady] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>("accueil");
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    setCountdown(getCountdown(OPENING_DATE));
-    setCountdownReady(true);
-
-    const timer = window.setInterval(() => {
-      setCountdown(getCountdown(OPENING_DATE));
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     const sections = SECTION_LINKS.map(({ id }) => document.getElementById(id)).filter(
@@ -250,9 +208,7 @@ export default function Home() {
             >
               Être prévenu
             </a>
-            <p className="drawer-meta">
-              Opening · 1<sup>er</sup> août 2026
-            </p>
+            <p className="drawer-meta">Opening · à l’automne 2026</p>
           </div>
         </aside>
 
@@ -299,31 +255,24 @@ export default function Home() {
           </div>
 
           <div className="hero-panels">
-            <article className="glass-card countdown-card">
-              <p className="card-eyebrow">Temps avant le 1er août 2026</p>
+            <article className="glass-card status-card">
+              <p className="card-eyebrow">Des nouvelles du chantier</p>
 
-              <div
-                className="countdown"
-                role="timer"
-                aria-live={countdownReady ? "polite" : "off"}
-              >
-                <div className="count-item">
-                  <strong>{countdownReady ? formatUnit(countdown.days) : "--"}</strong>
-                  <span>jours</span>
-                </div>
-                <div className="count-item">
-                  <strong>{countdownReady ? formatUnit(countdown.hours) : "--"}</strong>
-                  <span>heures</span>
-                </div>
-                <div className="count-item">
-                  <strong>{countdownReady ? formatUnit(countdown.minutes) : "--"}</strong>
-                  <span>min</span>
-                </div>
-                <div className="count-item">
-                  <strong>{countdownReady ? formatUnit(countdown.seconds) : "--"}</strong>
-                  <span>sec</span>
-                </div>
-              </div>
+              <p className="status-headline">
+                Pas encore de date d’ouverture
+              </p>
+
+              <p className="status-text">
+                Le projet prend un peu plus de temps que prévu : rien à
+                annoncer pour l’instant.
+              </p>
+
+              <p className="status-text">
+                Profitez de l’été. On revient vers vous avec du concret à la
+                rentrée.
+              </p>
+
+              <p className="status-badge">On se voit cet automne 🎯</p>
             </article>
           </div>
         </section>

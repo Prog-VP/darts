@@ -901,65 +901,54 @@ h1 {
   animation-delay: 340ms;
 }
 
-.countdown-card {
+.status-card {
   position: relative;
   overflow: hidden;
   min-height: 220px;
   box-shadow: 6px 6px 0 var(--green-deep);
 }
 
-.countdown-card:hover {
+.status-card:hover {
   box-shadow: 9px 9px 0 var(--green-deep);
 }
 
-.countdown-card .card-eyebrow {
+.status-card .card-eyebrow {
   margin-bottom: 1.25rem;
+  border-color: var(--green);
+  background: var(--green);
 }
 
-.countdown {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.7rem;
-}
-
-.count-item {
-  padding: 1.1rem 0.75rem;
-  border: 2px solid var(--cream);
-  border-radius: 14px;
-  background: var(--bg-deep);
-  text-align: center;
-  position: relative;
-}
-
-.count-item:nth-child(1) { background: var(--red); border-color: var(--red); }
-.count-item:nth-child(2) { background: var(--orange); border-color: var(--orange); }
-.count-item:nth-child(3) { background: var(--gold); border-color: var(--gold); }
-.count-item:nth-child(4) { background: var(--green); border-color: var(--green); }
-
-.count-item strong {
-  display: block;
+.status-headline {
   font-family: var(--font-ultra);
-  font-size: clamp(1.8rem, 3.2vw, 2.7rem);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: var(--cream);
-}
-
-.count-item:nth-child(3) strong { color: var(--bg-deep); }
-
-.count-item span {
-  display: block;
-  margin-top: 0.45rem;
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-size: clamp(1.45rem, 2.8vw, 2.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
   color: var(--cream);
-  opacity: 0.9;
 }
 
-.count-item:nth-child(3) span { color: var(--bg-deep); opacity: 0.75; }
+.status-text {
+  margin-top: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.15rem;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  background: var(--gold);
+  color: var(--bg-deep);
+  font-family: var(--font-ultra);
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: rotate(-1deg);
+  box-shadow: 4px 4px 0 var(--bg-deep);
+}
 
 /* ─── Section headings ───────────────────────────── */
 
@@ -1381,12 +1370,8 @@ h1 {
     padding-top: 0.5rem;
   }
 
-  .countdown {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .countdown-card {
-    min-height: 220px;
+  .status-card {
+    min-height: auto;
   }
 
   .invite-grid {
@@ -1408,8 +1393,8 @@ h1 {
     box-shadow: 6px 6px 0 var(--red-deep);
   }
 
-  .countdown-card,
-  .countdown-card:hover {
+  .status-card,
+  .status-card:hover {
     box-shadow: 4px 4px 0 var(--green-deep);
   }
 
@@ -1461,8 +1446,9 @@ h1 {
     align-items: stretch;
   }
 
-  .count-item {
-    padding: 0.9rem 0.6rem;
+  .status-badge {
+    width: 100%;
+    text-align: center;
   }
 
   .section-title {

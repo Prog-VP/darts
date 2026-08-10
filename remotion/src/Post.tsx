@@ -7,364 +7,593 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { loadFont as loadBebas } from "@remotion/google-fonts/BebasNeue";
-import { loadFont as loadOutfit } from "@remotion/google-fonts/Outfit";
+import { loadFont as loadUltra } from "@remotion/google-fonts/ArchivoBlack";
+import { loadFont as loadDisplay } from "@remotion/google-fonts/SpaceGrotesk";
 
-const { fontFamily: bebasFamily } = loadBebas();
-const { fontFamily: outfitFamily } = loadOutfit();
+const { fontFamily: ultraFamily } = loadUltra();
+const { fontFamily: displayFamily } = loadDisplay();
 
-const CREAM = "#F0E6D2";
-const RED = "#E63946";
-const GREEN = "#2D8B46";
-const AMBER = "#F4A024";
-const MUTED = "#9a9a9a";
-const BG = "#0a0a0a";
+const BG = "#0d0b09";
+const CARD_BG = "#141210";
+const CREAM = "#f7e8c4";
+const RED = "#ef3e4a";
+const RED_DEEP = "#c72a35";
+const GREEN = "#2fb06b";
+const GREEN_DEEP = "#1f8450";
+const GOLD = "#ffc94a";
+const ORANGE = "#ff7a2f";
+const MUTED = "#b6a98e";
 
+/* ── Timeline (30 fps) ─────────────────────────────── */
+const BADGE_IN = 6;
+const LOGO_IN = 10;
+const DARTS_IN = 20;
+const RED_LINE = 40;
+const GREEN_LINE = 48;
+const CARD_IN = 70;
+const DART_START = 108;
+const IMPACT = 126;
+const SWAP = 148;
+const SUBLINE_IN = 178;
+const FOOTER_IN = 202;
+const OUTRO_START = 288;
+const TOTAL = 300;
+
+/* Impact target: centre of the card's value row */
 const IMPACT_X = 540;
-const IMPACT_Y = 730;
-const DART_START_X = 1400;
-const DART_START_Y = -320;
-
-const DART_START_FRAME = 40;
-const IMPACT_FRAME = 56;
-const OUTRO_START = 200;
-const TOTAL = 240;
+const IMPACT_Y = 966;
+const DART_START_X = 1560;
+const DART_START_Y = 320;
 
 const rand = (seed: number) => {
   const x = Math.sin(seed * 12.9898) * 43758.5453;
   return x - Math.floor(x);
 };
 
-const STREAKS = Array.from({ length: 18 }, (_, i) => {
-  const baseAngle = (i / 18) * 360;
-  const angle = baseAngle + (rand(i * 7) - 0.5) * 22;
-  const length = 550 + rand(i * 13) * 420;
-  const width = 2 + Math.floor(rand(i * 23) * 3);
-  return { angle, length, width };
+const SHARDS = Array.from({ length: 16 }, (_, i) => {
+  const angle = (i / 16) * 360 + (rand(i * 11) - 0.5) * 30;
+  const distance = 220 + rand(i * 17) * 300;
+  const spin = (160 + rand(i * 19) * 260) * (rand(i * 29) > 0.5 ? 1 : -1);
+  const size = 9 + rand(i * 31) * 16;
+  const color = [RED, GOLD, ORANGE, GREEN][i % 4];
+  return { angle, distance, spin, size, color };
 });
 
-const SHARDS = Array.from({ length: 14 }, (_, i) => {
-  const angle = (i / 14) * 360 + (rand(i * 11) - 0.5) * 25;
-  const distance = 420 + rand(i * 17) * 420;
-  const spin =
-    (140 + rand(i * 19) * 220) * (rand(i * 29) > 0.5 ? 1 : -1);
-  const size = 10 + rand(i * 31) * 22;
-  return { angle, distance, spin, size };
-});
+const DART_W = 205;
+const DART_H = 52;
 
-const Dart: React.FC = () => {
-  return (
-    <div style={{ position: "relative", width: 125, height: 32 }}>
-      <div
-        style={{
-          position: "absolute",
-          right: 0,
-          top: "50%",
-          width: 18,
-          height: 6,
-          background: "linear-gradient(90deg, #8a8a8a, #f2f2f2)",
-          transform: "translateY(-50%)",
-          clipPath: "polygon(0 0, 100% 50%, 0 100%)",
-          filter: "drop-shadow(0 0 4px rgba(255,255,255,0.3))",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          right: 15,
-          top: "50%",
-          width: 52,
-          height: 10,
-          background: "linear-gradient(180deg, #e8e8e8, #7a7a7a 55%, #c0c0c0)",
-          transform: "translateY(-50%)",
-          borderRadius: 2,
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.4)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          right: 65,
-          top: "50%",
-          width: 22,
-          height: 3,
-          background: "#2a2a2a",
-          transform: "translateY(-50%)",
-          borderRadius: 1,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          right: 85,
-          top: "50%",
-          width: 40,
-          height: 32,
-          background:
-            "linear-gradient(180deg, #E63946 0%, #E63946 50%, #2D8B46 50%, #2D8B46 100%)",
-          transform: "translateY(-50%)",
-          clipPath: "polygon(0 0, 100% 50%, 0 100%)",
-        }}
-      />
-    </div>
-  );
-};
+const Dart: React.FC = () => (
+  <div style={{ position: "relative", width: DART_W, height: DART_H }}>
+    {/* pointe */}
+    <div
+      style={{
+        position: "absolute",
+        right: 0,
+        top: "50%",
+        width: 30,
+        height: 10,
+        background: "linear-gradient(90deg, #8a8a8a, #f6f2e8)",
+        transform: "translateY(-50%)",
+        clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+      }}
+    />
+    {/* barrel */}
+    <div
+      style={{
+        position: "absolute",
+        right: 25,
+        top: "50%",
+        width: 85,
+        height: 17,
+        background: "linear-gradient(180deg, #efe9dc, #77716a 55%, #cdc6ba)",
+        transform: "translateY(-50%)",
+        borderRadius: 4,
+      }}
+    />
+    {/* tige */}
+    <div
+      style={{
+        position: "absolute",
+        right: 107,
+        top: "50%",
+        width: 36,
+        height: 6,
+        background: "#2a2724",
+        transform: "translateY(-50%)",
+        borderRadius: 3,
+      }}
+    />
+    {/* ailette rouge / verte */}
+    <div
+      style={{
+        position: "absolute",
+        right: 137,
+        top: "50%",
+        width: 68,
+        height: DART_H,
+        background: `linear-gradient(180deg, ${RED} 0%, ${RED} 50%, ${GREEN} 50%, ${GREEN} 100%)`,
+        transform: "translateY(-50%)",
+        clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+      }}
+    />
+  </div>
+);
 
 export const Post: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-
-  const glowPulse =
-    0.55 + Math.sin((frame / fps) * (Math.PI / 2)) * 0.2;
 
   const outroFade = interpolate(frame, [OUTRO_START, TOTAL - 1], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Opening hook
-  const hookFlash = interpolate(frame, [0, 2, 6], [1, 0.3, 0], {
+  /* Hook d'ouverture */
+  const hookFlash = interpolate(frame, [0, 2, 7], [1, 0.28, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const hookCore = interpolate(frame, [0, 4, 12], [1, 0.55, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const shockwaveProgress = interpolate(frame, [0, 16], [0, 1], {
+  const ringProgress = interpolate(frame, [0, 18], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
   });
-  const shockwaveOpacity = interpolate(frame, [0, 4, 16], [0.95, 0.6, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const streakProgress = interpolate(frame, [0, 14], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.quad),
-  });
-  const streakOpacity = interpolate(frame, [0, 6, 20, 38], [1, 0.9, 0.3, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const shardProgress = interpolate(frame, [0, 22], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
-  const shardOpacity = interpolate(frame, [0, 4, 18, 30], [1, 0.95, 0.4, 0], {
+  const ringOpacity = interpolate(frame, [0, 5, 18], [0.9, 0.5, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Shake: two events (opening + dart impact)
-  const initialShake = interpolate(frame, [0, 3, 14], [22, 10, 0], {
+  /* Secousses : ouverture + impact fléchette */
+  const openShake = interpolate(frame, [0, 4, 15], [18, 8, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const dartShake = interpolate(
+  const impactShake = interpolate(
     frame,
-    [IMPACT_FRAME, IMPACT_FRAME + 3, IMPACT_FRAME + 12],
-    [0, 14, 0],
+    [IMPACT, IMPACT + 3, IMPACT + 14],
+    [0, 16, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
-  const shakeStrength = Math.max(initialShake, dartShake);
-  const shakeX = shakeStrength * Math.sin(frame * 3.7);
-  const shakeY = shakeStrength * Math.cos(frame * 4.3);
+  const shake = Math.max(openShake, impactShake);
+  const shakeX = shake * Math.sin(frame * 3.7);
+  const shakeY = shake * Math.cos(frame * 4.3);
 
-  // Tag
-  const tagY = interpolate(frame, [6, 26], [-60, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
-  const tagOpacity = interpolate(frame, [6, 26], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
+  /* Badge */
+  const badge = spring({
+    frame: frame - BADGE_IN,
+    fps,
+    config: { damping: 13, mass: 0.6 },
+    durationInFrames: 22,
   });
 
-  // Logo
+  /* Logo */
   const lausanne = spring({
-    frame: frame - 8,
+    frame: frame - LOGO_IN,
     fps,
     config: { damping: 14, mass: 0.7 },
     durationInFrames: 25,
   });
   const darts = spring({
-    frame: frame - 18,
+    frame: frame - DARTS_IN,
     fps,
     config: { damping: 14, mass: 0.7 },
     durationInFrames: 25,
   });
 
-  // Underlines
-  const redLine = interpolate(frame, [34, 56], [0, 1], {
+  const redLine = interpolate(frame, [RED_LINE, RED_LINE + 22], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
   });
-  const greenLine = interpolate(frame, [44, 66], [0, 1], {
+  const greenLine = interpolate(frame, [GREEN_LINE, GREEN_LINE + 22], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
   });
 
-  // Tagline
-  const tagline = interpolate(frame, [68, 90], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  // Card
+  /* Carte */
   const cardScale = spring({
-    frame: frame - 92,
+    frame: frame - CARD_IN,
     fps,
     config: { damping: 12, mass: 0.6 },
-    durationInFrames: 30,
+    durationInFrames: 28,
   });
-  const cardOpacity = interpolate(frame, [92, 118], [0, 1], {
+  const cardOpacity = interpolate(frame, [CARD_IN, CARD_IN + 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Footer
-  const footerOpacity = interpolate(frame, [128, 148], [0, 1], {
+  /* Vol de la fléchette */
+  const dartProgress = interpolate(frame, [DART_START, IMPACT], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
+    easing: Easing.in(Easing.quad),
   });
-
-  // Dart flight
-  const dartProgress = interpolate(
-    frame,
-    [DART_START_FRAME, IMPACT_FRAME],
-    [0, 1],
-    {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: Easing.in(Easing.quad),
-    }
-  );
-  const dartVisible = frame >= DART_START_FRAME;
   const dartTipX = DART_START_X + (IMPACT_X - DART_START_X) * dartProgress;
   const dartTipY = DART_START_Y + (IMPACT_Y - DART_START_Y) * dartProgress;
   const dartAngle =
     (Math.atan2(IMPACT_Y - DART_START_Y, IMPACT_X - DART_START_X) * 180) /
     Math.PI;
+  const dartWobble =
+    frame >= IMPACT
+      ? Math.sin((frame - IMPACT) * 1.1) *
+        Math.max(0, 7 - (frame - IMPACT) * 0.55)
+      : 0;
+  const dartVisible = frame >= DART_START && frame < SWAP + 10;
+  const dartFade = interpolate(frame, [SWAP, SWAP + 9], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
-  // Dart impact sparks
-  const sparkProgress = interpolate(
-    frame,
-    [IMPACT_FRAME, IMPACT_FRAME + 16],
-    [0, 1],
-    {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: Easing.out(Easing.cubic),
-    }
-  );
+  /* Barre de rature sur la date */
+  const strike = interpolate(frame, [IMPACT, IMPACT + 8], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+
+  /* Étincelles à l'impact */
+  const sparkProgress = interpolate(frame, [IMPACT, IMPACT + 18], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
   const sparkOpacity = interpolate(
     frame,
-    [IMPACT_FRAME, IMPACT_FRAME + 5, IMPACT_FRAME + 16],
-    [1, 0.95, 0],
+    [IMPACT, IMPACT + 6, IMPACT + 20],
+    [1, 0.9, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  const floatY =
-    frame > 118
-      ? Math.sin(((frame - 118) / fps) * (Math.PI / 2)) * 4
+  /* Bascule ancienne date → cet automne */
+  const oldDateOut = interpolate(frame, [SWAP, SWAP + 9], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const oldDateDrop = interpolate(frame, [SWAP, SWAP + 14], [0, 130], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.in(Easing.quad),
+  });
+  const newDate = spring({
+    frame: frame - (SWAP + 10),
+    fps,
+    config: { damping: 11, mass: 0.6 },
+    durationInFrames: 26,
+  });
+
+  /* Textes de bas de visuel */
+  const subline = interpolate(frame, [SUBLINE_IN, SUBLINE_IN + 20], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const sublineY = interpolate(frame, [SUBLINE_IN, SUBLINE_IN + 20], [26, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+  const footer = interpolate(frame, [FOOTER_IN, FOOTER_IN + 18], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const float =
+    frame > CARD_IN + 28
+      ? Math.sin(((frame - CARD_IN - 28) / fps) * (Math.PI / 2)) * 4
       : 0;
 
   return (
     <AbsoluteFill style={{ background: BG, overflow: "hidden" }}>
-      <div
+      {/* Fond : mêmes halos que le site */}
+      <AbsoluteFill
         style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: 1500,
-          height: 1500,
-          transform: "translate(-50%, -50%)",
-          borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(230, 57, 70, ${
-            glowPulse * 0.18
-          }) 0%, rgba(45, 139, 70, ${
-            glowPulse * 0.1
-          }) 35%, transparent 65%)`,
-          filter: "blur(90px)",
+          background: `
+            radial-gradient(circle at 8% 6%, rgba(239, 62, 74, 0.22), transparent 34%),
+            radial-gradient(circle at 92% 12%, rgba(255, 122, 47, 0.18), transparent 30%),
+            radial-gradient(circle at 12% 88%, rgba(47, 176, 107, 0.16), transparent 34%),
+            radial-gradient(circle at 88% 86%, rgba(255, 201, 74, 0.14), transparent 32%)
+          `,
         }}
       />
 
-      <div
+      <AbsoluteFill
         style={{
-          position: "absolute",
-          inset: 0,
           transform: `translate(${shakeX}px, ${shakeY}px)`,
           opacity: outroFade,
         }}
       >
-        {hookCore > 0 && (
+        {/* Onde de choc d'ouverture */}
+        {ringOpacity > 0 && (
           <div
             style={{
               position: "absolute",
-              left: IMPACT_X,
-              top: IMPACT_Y,
-              width: 650,
-              height: 650,
-              transform: "translate(-50%, -50%)",
+              left: 540,
+              top: 640,
+              width: 80 + ringProgress * 1750,
+              height: 80 + ringProgress * 1750,
               borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,214,102,0.75) 25%, rgba(244,160,36,0.4) 50%, transparent 72%)",
-              opacity: hookCore,
-              filter: "blur(32px)",
-              pointerEvents: "none",
+              border: `${6 + (1 - ringProgress) * 8}px solid rgba(247,232,196,${ringOpacity})`,
+              transform: "translate(-50%, -50%)",
             }}
           />
         )}
 
-        {shockwaveOpacity > 0 && (
+        {/* Badge */}
+        <div
+          style={{
+            position: "absolute",
+            top: 208,
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+            opacity: badge,
+            transform: `translateY(${(1 - badge) * -40}px)`,
+          }}
+        >
           <div
             style={{
-              position: "absolute",
-              left: IMPACT_X,
-              top: IMPACT_Y,
-              width: 60 + shockwaveProgress * 1700,
-              height: 60 + shockwaveProgress * 1700,
-              borderRadius: "50%",
-              border: `${
-                4 + (1 - shockwaveProgress) * 6
-              }px solid rgba(255, 255, 255, ${shockwaveOpacity})`,
-              transform: "translate(-50%, -50%)",
-              boxShadow: `0 0 80px rgba(255,255,255,${shockwaveOpacity * 0.5})`,
-              pointerEvents: "none",
+              padding: "16px 34px",
+              border: `3px solid ${RED}`,
+              borderRadius: 999,
+              background: RED,
+              color: CREAM,
+              fontFamily: ultraFamily,
+              fontSize: 24,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              transform: "rotate(-1.6deg)",
+              boxShadow: `6px 6px 0 ${CREAM}`,
             }}
-          />
-        )}
+          >
+            Des nouvelles du chantier
+          </div>
+        </div>
 
-        {streakOpacity > 0 &&
-          STREAKS.map((s, i) => (
+        {/* Logo */}
+        <div
+          style={{
+            position: "absolute",
+            top: 330,
+            left: 0,
+            right: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            fontFamily: ultraFamily,
+            fontSize: 168,
+            lineHeight: 0.92,
+            letterSpacing: "-0.045em",
+            textTransform: "uppercase",
+            color: CREAM,
+          }}
+        >
+          <div
+            style={{
+              opacity: lausanne,
+              transform: `translateY(${(1 - lausanne) * 46}px)`,
+            }}
+          >
+            Lausanne
+          </div>
+          <div
+            style={{
+              opacity: darts,
+              transform: `translateY(${(1 - darts) * 46}px)`,
+              position: "relative",
+              paddingBottom: 44,
+            }}
+          >
+            Darts
             <div
-              key={`streak-${i}`}
               style={{
                 position: "absolute",
-                left: IMPACT_X,
-                top: IMPACT_Y,
-                width: streakProgress * s.length,
-                height: s.width,
-                transformOrigin: "0 50%",
-                transform: `translateY(-${s.width / 2}px) rotate(${
-                  s.angle
-                }deg)`,
-                background: `linear-gradient(90deg, rgba(255,255,255,${streakOpacity}) 0%, rgba(255,255,255,${
-                  streakOpacity * 0.35
-                }) 55%, transparent 100%)`,
-                pointerEvents: "none",
+                bottom: 26,
+                left: 0,
+                height: 12,
+                width: `${redLine * 100}%`,
+                background: RED,
+                borderRadius: 6,
               }}
             />
-          ))}
+            <div
+              style={{
+                position: "absolute",
+                bottom: 6,
+                left: 0,
+                height: 12,
+                width: `${greenLine * 100}%`,
+                background: GREEN,
+                borderRadius: 6,
+              }}
+            />
+          </div>
+        </div>
 
-        {shardOpacity > 0 &&
+        {/* Carte date */}
+        <div
+          style={{
+            position: "absolute",
+            top: 812,
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              width: 780,
+              opacity: cardOpacity,
+              transform: `scale(${cardScale}) translateY(${float}px)`,
+              padding: "40px 48px 46px",
+              border: `4px solid ${CREAM}`,
+              borderRadius: 28,
+              background: CARD_BG,
+              boxShadow: `12px 12px 0 ${GREEN_DEEP}`,
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: displayFamily,
+                fontWeight: 700,
+                fontSize: 22,
+                letterSpacing: "0.3em",
+                textTransform: "uppercase",
+                color: MUTED,
+                marginBottom: 22,
+              }}
+            >
+              Ouverture
+            </div>
+
+            {/* Zone valeur : ancienne date puis « cet automne » */}
+            <div style={{ position: "relative", height: 132 }}>
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: oldDateOut,
+                  transform: `translateY(${oldDateDrop}px) rotate(${
+                    oldDateDrop * 0.09
+                  }deg)`,
+                }}
+              >
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <span
+                    style={{
+                      fontFamily: ultraFamily,
+                      fontSize: 88,
+                      lineHeight: 1,
+                      letterSpacing: "-0.03em",
+                      textTransform: "uppercase",
+                      whiteSpace: "nowrap",
+                      color: CREAM,
+                      opacity: 1 - strike * 0.45,
+                    }}
+                  >
+                    1er août
+                  </span>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "52%",
+                      left: -18,
+                      width: `${strike * 116}%`,
+                      height: 14,
+                      background: RED,
+                      borderRadius: 7,
+                      transform: "translateY(-50%) rotate(-3deg)",
+                      boxShadow: `0 0 0 4px ${CARD_BG}`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: newDate,
+                  transform: `scale(${0.7 + newDate * 0.3})`,
+                }}
+              >
+                <div
+                  style={{
+                    padding: "22px 44px",
+                    borderRadius: 20,
+                    background: GOLD,
+                    color: BG,
+                    fontFamily: ultraFamily,
+                    fontSize: 66,
+                    lineHeight: 1,
+                    letterSpacing: "-0.02em",
+                    textTransform: "uppercase",
+                    whiteSpace: "nowrap",
+                    transform: "rotate(-1.5deg)",
+                    boxShadow: `10px 10px 0 ${RED_DEEP}`,
+                  }}
+                >
+                  Cet automne
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sous-titre */}
+        <div
+          style={{
+            position: "absolute",
+            top: 1122,
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            padding: "0 110px",
+            opacity: subline,
+            transform: `translateY(${sublineY}px)`,
+            fontFamily: displayFamily,
+            fontWeight: 600,
+            fontSize: 34,
+            lineHeight: 1.35,
+            color: MUTED,
+          }}
+        >
+          Pas encore de date d’ouverture.
+          <br />
+          Profitez de l’été — on se voit à la rentrée.
+        </div>
+
+        {/* Pied */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 74,
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            opacity: footer,
+            fontFamily: ultraFamily,
+            fontSize: 22,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: "#7a6f5c",
+          }}
+        >
+          lausanne-darts.ch
+        </div>
+
+        {/* Fléchette */}
+        {dartVisible && (
+          <div
+            style={{
+              position: "absolute",
+              left: dartTipX - DART_W,
+              top: dartTipY - DART_H / 2 + oldDateDrop,
+              width: DART_W,
+              height: DART_H,
+              transform: `rotate(${
+                dartAngle + dartWobble + oldDateDrop * 0.09
+              }deg)`,
+              transformOrigin: "100% 50%",
+              opacity: dartFade,
+              filter: "drop-shadow(0 8px 14px rgba(0,0,0,0.55))",
+            }}
+          >
+            <Dart />
+          </div>
+        )}
+
+        {/* Éclats à l'impact */}
+        {frame >= IMPACT &&
+          sparkOpacity > 0 &&
           SHARDS.map((s, i) => (
             <div
               key={`shard-${i}`}
@@ -377,301 +606,19 @@ export const Post: React.FC = () => {
                 transformOrigin: "50% 50%",
                 transform: `translate(-50%, -50%) rotate(${
                   s.angle
-                }deg) translateX(${s.distance * shardProgress}px) rotate(${
-                  s.spin * shardProgress
+                }deg) translateX(${s.distance * sparkProgress}px) rotate(${
+                  s.spin * sparkProgress
                 }deg)`,
-                background: `rgba(240, 230, 210, ${shardOpacity})`,
+                background: s.color,
+                opacity: sparkOpacity,
                 clipPath: "polygon(0 30%, 100% 0, 70% 100%)",
-                pointerEvents: "none",
-                boxShadow: `0 0 8px rgba(255,255,255,${shardOpacity * 0.5})`,
               }}
             />
           ))}
-
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: outfitFamily,
-            color: CREAM,
-          }}
-        >
-          <div
-            style={{
-              opacity: tagOpacity,
-              transform: `translateY(${tagY}px)`,
-              padding: "14px 34px",
-              border: `1px solid rgba(244, 160, 36, 0.3)`,
-              borderRadius: 999,
-              background: "rgba(244, 160, 36, 0.1)",
-              color: AMBER,
-              fontSize: 22,
-              fontWeight: 700,
-              letterSpacing: "0.24em",
-              textTransform: "uppercase",
-              marginBottom: 60,
-            }}
-          >
-            Save the date
-          </div>
-
-          <div
-            style={{
-              fontFamily: bebasFamily,
-              fontSize: 220,
-              lineHeight: 0.82,
-              letterSpacing: "-0.04em",
-              textTransform: "uppercase",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <div
-              style={{
-                opacity: lausanne,
-                transform: `translateY(${(1 - lausanne) * 40}px)`,
-                color: CREAM,
-              }}
-            >
-              Lausanne
-            </div>
-            <div
-              style={{
-                opacity: darts,
-                transform: `translateY(${(1 - darts) * 40}px)`,
-                color: CREAM,
-                position: "relative",
-                paddingBottom: "0.22em",
-              }}
-            >
-              Darts
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 28,
-                  left: 0,
-                  height: 6,
-                  width: `${redLine * 100}%`,
-                  background: RED,
-                  borderRadius: 3,
-                  boxShadow: `0 0 24px ${RED}`,
-                }}
-              >
-                {redLine >= 1 && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: 20,
-                      height: 20,
-                      borderRadius: "50%",
-                      background: RED,
-                      transform: "translate(-50%, -50%)",
-                      boxShadow: `0 0 16px ${RED}`,
-                    }}
-                  />
-                )}
-              </div>
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 12,
-                  left: 0,
-                  height: 6,
-                  width: `${greenLine * 100}%`,
-                  background: GREEN,
-                  borderRadius: 3,
-                  boxShadow: `0 0 24px ${GREEN}`,
-                }}
-              >
-                {greenLine >= 1 && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: 20,
-                      height: 20,
-                      borderRadius: "50%",
-                      background: GREEN,
-                      transform: "translate(-50%, -50%)",
-                      boxShadow: `0 0 16px ${GREEN}`,
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div
-            style={{
-              opacity: tagline,
-              marginTop: 36,
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: "0.55em",
-              textTransform: "uppercase",
-              color: MUTED,
-              paddingLeft: "0.55em",
-            }}
-          >
-            Pile au centre
-          </div>
-
-          <div
-            style={{
-              opacity: cardOpacity,
-              transform: `scale(${cardScale}) translateY(${floatY}px)`,
-              marginTop: 90,
-              padding: "38px 70px",
-              border: "1px solid rgba(255,255,255,0.18)",
-              borderRadius: 28,
-              background: "rgba(17,17,17,0.7)",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 18,
-                fontWeight: 600,
-                letterSpacing: "0.28em",
-                textTransform: "uppercase",
-                color: MUTED,
-                marginBottom: 14,
-              }}
-            >
-              Opening
-            </div>
-            <div
-              style={{
-                fontFamily: bebasFamily,
-                fontSize: 84,
-                letterSpacing: "0.02em",
-                color: CREAM,
-                lineHeight: 1,
-              }}
-            >
-              1
-              <sup style={{ fontSize: "0.45em", verticalAlign: "super" }}>
-                er
-              </sup>{" "}
-              août 2026
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            position: "absolute",
-            bottom: 90,
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            opacity: footerOpacity,
-            fontSize: 18,
-            fontWeight: 600,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            color: "#6a6a6a",
-            fontFamily: outfitFamily,
-          }}
-        >
-          lausanne-darts.ch
-        </div>
-
-        {dartVisible && (
-          <div
-            style={{
-              position: "absolute",
-              left: dartTipX - 125,
-              top: dartTipY - 16,
-              width: 125,
-              height: 32,
-              transform: `rotate(${dartAngle}deg)`,
-              transformOrigin: "100% 50%",
-              filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.5))",
-            }}
-          >
-            <Dart />
-          </div>
-        )}
-
-        {sparkProgress > 0 && sparkOpacity > 0 && (
-          <>
-            <div
-              style={{
-                position: "absolute",
-                left: IMPACT_X,
-                top: IMPACT_Y,
-                width: 0,
-                height: 0,
-              }}
-            >
-              {Array.from({ length: 12 }).map((_, i) => {
-                const angle = (i / 12) * 360 + (i % 2) * 6;
-                const length = 30 + sparkProgress * 90;
-                const distance = sparkProgress * 40;
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      position: "absolute",
-                      width: length,
-                      height: 2,
-                      left: 0,
-                      top: -1,
-                      transform: `rotate(${angle}deg) translateX(${distance}px)`,
-                      transformOrigin: "0 50%",
-                      background: `linear-gradient(90deg, ${AMBER}, rgba(244,160,36,0))`,
-                      opacity: sparkOpacity,
-                      borderRadius: 2,
-                    }}
-                  />
-                );
-              })}
-            </div>
-            <div
-              style={{
-                position: "absolute",
-                left: IMPACT_X,
-                top: IMPACT_Y,
-                width: 0,
-                height: 0,
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  left: `${-60 - sparkProgress * 40}px`,
-                  top: `${-60 - sparkProgress * 40}px`,
-                  width: 120 + sparkProgress * 80,
-                  height: 120 + sparkProgress * 80,
-                  borderRadius: "50%",
-                  border: `2px solid ${AMBER}`,
-                  opacity: sparkOpacity * 0.6,
-                }}
-              />
-            </div>
-          </>
-        )}
-      </div>
+      </AbsoluteFill>
 
       {hookFlash > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "white",
-            opacity: hookFlash,
-            pointerEvents: "none",
-          }}
-        />
+        <AbsoluteFill style={{ background: CREAM, opacity: hookFlash }} />
       )}
     </AbsoluteFill>
   );

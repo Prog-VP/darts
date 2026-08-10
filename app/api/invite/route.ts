@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       from: FROM,
       to: email,
       subject: "Merci pour ton inscription — Lausanne Darts 🎯",
-      text: `Hello ${prenom},\n\nMerci pour ton inscription — on est ravis de te compter parmi les premiers à suivre l'aventure Lausanne Darts.\n\nOn t'écrira au lancement, le 1er août 2026.\nRue St-Martin 9, Lausanne.\n\nÀ très vite,\nL'équipe Lausanne Darts`,
+      text: `Hello ${prenom},\n\nMerci pour ton inscription — on est ravis de te compter parmi les premiers à suivre l'aventure Lausanne Darts.\n\nPoint d'étape : on n'a pas encore de date d'ouverture, le projet prend un peu plus de temps que prévu. Profite de l'été, on se voit cet automne.\n\nOn t'écrira dès qu'on aura une date.\nRue St-Martin 9, Lausanne.\n\nÀ très vite,\nL'équipe Lausanne Darts`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a1a; max-width: 560px; margin: 0 auto; padding: 32px 28px; background: #0a0a0a; color: #F0E6D2; border-radius: 12px;">
           <div style="text-align: center; margin-bottom: 24px;">
@@ -63,12 +63,12 @@ export async function POST(request: NextRequest) {
           </p>
 
           <p style="font-size: 15px; line-height: 1.6; color: #cfcfc5;">
-            On t'écrira dès l'ouverture :
+            Point d'étape : on n'a pas encore de date d'ouverture, le projet prend un peu plus de temps que prévu. Profite de l'été — on se voit cet automne, et on t'écrit dès qu'on a une date.
           </p>
 
           <div style="margin: 20px 0; padding: 16px 20px; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; background: #141414; text-align: center;">
             <div style="font-size: 11px; letter-spacing: 0.2em; color: #9a9a9a; text-transform: uppercase;">Opening</div>
-            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; margin-top: 4px;">1er août 2026</div>
+            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; margin-top: 4px;">Cet automne</div>
             <div style="font-size: 13px; color: #9a9a9a; margin-top: 6px;">Rue St-Martin 9, Lausanne</div>
           </div>
 

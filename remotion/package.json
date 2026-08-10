@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "studio": "remotion studio",
-    "render": "remotion render Post out/lausanne-darts-post.mp4"
+    "render": "remotion render Post out/lausanne-darts-automne.mp4 --crf=18"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.0",

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, MouseEvent as ReactMouseEvent } from "react";
 
 const BEST_DARTS_KEY = "lausanne-darts-best-darts";
+const RULES_SEEN_KEY = "lausanne-darts-rules-seen";
 const STARTING_SCORE = 501;
 
 type Zone = "miss" | "single" | "double" | "triple" | "bull" | "bullseye";
@@ -36,6 +37,17 @@ function getScore(x: number, y: number): { value: number; label: string; zone: Z
   if (dist >= R_DOUBLE_IN && dist <= R_DOUBLE_OUT) return { value: base * 2, label: `D${base}`, zone: "double" };
   if (dist >= R_TRIPLE_IN && dist <= R_TRIPLE_OUT) return { value: base * 3, label: `T${base}`, zone: "triple" };
   return { value: base, label: `${base}`, zone: "single" };
+}
+
+// Traduit les codes de fléchettes (T20, D16, Bull…) en français lisible
+// pour quelqu'un qui n'a jamais joué.
+function readableLabel(code: string): string {
+  if (code === "Bullseye") return "Centre rouge";
+  if (code === "Bull" || code === "25") return "Centre vert";
+  if (code === "Raté") return "Raté";
+  if (code.startsWith("T")) return `Triple ${code.slice(1)}`;
+  if (code.startsWith("D")) return `Double ${code.slice(1)}`;
+  return `Simple ${code}`;
 }
 
 function suggestCheckout(n: number): string[] | null {
@@ -81,10 +93,12 @@ export default function GamePage() {
   const [totalDarts, setTotalDarts] = useState<number>(0);
   const [lastLabel, setLastLabel] = useState<string>("—");
   const [bust, setBust] = useState<boolean>(false);
+  const [bustReason, setBustReason] = useState<string>("");
   const [won, setWon] = useState<boolean>(false);
   const [bestDarts, setBestDarts] = useState<number | null>(null);
   const [gamesPlayed, setGamesPlayed] = useState<number>(0);
   const [lastVisitScore, setLastVisitScore] = useState<number>(0);
+  const [showRules, setShowRules] = useState<boolean>(false);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(BEST_DARTS_KEY);
@@ -92,10 +106,16 @@ export default function GamePage() {
       const value = Number(stored);
       if (value > 0) setBestDarts(value);
     }
+    if (!window.localStorage.getItem(RULES_SEEN_KEY)) setShowRules(true);
   }, []);
 
+  const closeRules = () => {
+    setShowRules(false);
+    window.localStorage.setItem(RULES_SEEN_KEY, "1");
+  };
+
   const throwDart = (clientX: number, clientY: number, rect: DOMRect) => {
-    if (won || bust) return;
+    if (won || bust || showRules) return;
     if (visitDarts.length >= 3) return;
 
     const scaleX = (BOARD_SIZE + 80) / rect.width;
@@ -138,6 +158,13 @@ export default function GamePage() {
 
     if (isBust) {
       setVisitDarts(updatedVisit);
+      setBustReason(
+        potential < 0
+          ? "Tu es passé en dessous de zéro."
+          : potential === 1
+            ? "Il resterait 1 point, et 1 ne peut pas se finir sur un double."
+            : "Il faut finir sur un double, pas sur un simple."
+      );
       setBust(true);
       setLastVisitScore(0);
       window.setTimeout(() => {
@@ -200,8 +227,13 @@ export default function GamePage() {
     <main style={styles.main} className="jeu-main">
       <div style={styles.header} className="jeu-header">
         <a href="/" style={styles.back} className="jeu-back">← Retour</a>
-        <h1 style={styles.title} className="jeu-title">501 SIDO</h1>
-        <p style={styles.sub} className="jeu-sub">Commence direct, finis sur un double.</p>
+        <h1 style={styles.title} className="jeu-title">501</h1>
+        <p style={styles.sub} className="jeu-sub">
+          Tu pars de 501. Clique sur la cible et tombe pile à 0.
+        </p>
+        <button type="button" className="jeu-rules-link" onClick={() => setShowRules(true)}>
+          Comment on joue ?
+        </button>
       </div>
 
       <div className="jeu-panel">
@@ -210,49 +242,71 @@ export default function GamePage() {
             const d = visitDarts[i];
             return (
               <div key={i} className={`jeu-visit-slot ${d ? "is-filled" : ""}`}>
-                {d ? d.label : "—"}
+                {d ? (
+                  <>
+                    <span className="jeu-visit-label">{readableLabel(d.label)}</span>
+                    <span className="jeu-visit-points">{d.score} pts</span>
+                  </>
+                ) : (
+                  <span className="jeu-visit-empty">Fléchette {i + 1}</span>
+                )}
               </div>
             );
           })}
         </div>
 
-        {checkout && !won && (
-          <div className="jeu-checkout">
-            <span className="jeu-checkout-label">Checkout</span>
-            <span className="jeu-checkout-route">
-              {checkout.map((c, i) => (
-                <span key={i} className="jeu-checkout-step">{c}</span>
-              ))}
-            </span>
-          </div>
-        )}
+        {!won &&
+          (checkout ? (
+            <div className="jeu-checkout">
+              <span className="jeu-checkout-label">Pour finir</span>
+              <span className="jeu-checkout-route">
+                {checkout.map((c, i) => (
+                  <span key={i} className="jeu-checkout-step">{readableLabel(c)}</span>
+                ))}
+              </span>
+              <span className="jeu-checkout-note">à toucher dans cet ordre</span>
+            </div>
+          ) : (
+            <div className="jeu-checkout">
+              <span className="jeu-checkout-label">Objectif</span>
+              <span className="jeu-checkout-note">
+                Descends à 170 ou moins pour pouvoir terminer. Le triple 20 — le
+                petit anneau du milieu — vaut 60 points.
+              </span>
+            </div>
+          ))}
 
         <div className="jeu-score-main">
           <div className="jeu-score-side">
-            <span className="jeu-score-prev">{visitStartScore}</span>
-            <span className="jeu-score-delta">
-              {visitDarts.length > 0 ? `−${visitScoreLive}` : ""}
-            </span>
-            <span className="jeu-score-player">V1NCENT_P</span>
+            {visitDarts.length > 0 && !bust && (
+              <>
+                <span className="jeu-score-prev">{remaining + visitScoreLive}</span>
+                <span className="jeu-score-delta">−{visitScoreLive}</span>
+                <span className="jeu-score-player">marqués ce tour</span>
+              </>
+            )}
           </div>
-          <div className="jeu-score-big">{remaining}</div>
+          <div className="jeu-score-right">
+            <div className="jeu-score-big">{remaining}</div>
+            <span className="jeu-score-caption">points restants</span>
+          </div>
         </div>
 
         <div className="jeu-score-footer">
           <div className="jeu-foot-item">
-            <span>PPR</span>
+            <span>Moyenne / tour</span>
             <strong>{ppr.toFixed(1)}</strong>
           </div>
           <div className="jeu-foot-item">
-            <span>Dernière volée</span>
+            <span>Tour précédent</span>
             <strong>{lastVisitScore}</strong>
           </div>
           <div className="jeu-foot-item">
-            <span>Darts</span>
+            <span>Fléchettes</span>
             <strong>{totalDarts}</strong>
           </div>
           <div className="jeu-foot-item">
-            <span>Best</span>
+            <span>Record</span>
             <strong>{bestDarts ?? "—"}</strong>
           </div>
         </div>
@@ -299,8 +353,74 @@ export default function GamePage() {
         ))}
       </svg>
 
+      <ul className="jeu-legend" aria-label="Valeur des zones de la cible">
+        <li>
+          <span className="jeu-legend-swatch jeu-legend-swatch--accent" />
+          Anneau extérieur = <strong>double</strong> (×2)
+        </li>
+        <li>
+          <span className="jeu-legend-swatch jeu-legend-swatch--accent" />
+          Anneau du milieu = <strong>triple</strong> (×3)
+        </li>
+        <li>
+          <span className="jeu-legend-swatch jeu-legend-swatch--green" />
+          Centre vert = <strong>25</strong>
+        </li>
+        <li>
+          <span className="jeu-legend-swatch jeu-legend-swatch--red" />
+          Centre rouge = <strong>50</strong>
+        </li>
+      </ul>
+
       {bust && (
-        <div className="jeu-bust" aria-live="assertive">BUST</div>
+        <div className="jeu-bust" aria-live="assertive">
+          <span className="jeu-bust-word">Raté !</span>
+          <span className="jeu-bust-sub">
+            {bustReason} Le tour est annulé, ton score revient à {visitStartScore}.
+          </span>
+        </div>
+      )}
+
+      {showRules && (
+        <div
+          className="jeu-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="jeu-rules-title"
+        >
+          <div className="jeu-modal jeu-modal--rules">
+            <p id="jeu-rules-title" className="jeu-rules-title">Les règles en 30 secondes</p>
+            <ol className="jeu-rules-list">
+              <li>
+                <strong>Tu pars de 501.</strong> Chaque fléchette retire les points de
+                la zone touchée. Le but : tomber exactement à 0.
+              </li>
+              <li>
+                <strong>Trois fléchettes par tour.</strong> Clique sur la cible pour
+                lancer. La fléchette part un peu à côté de ton clic — comme dans la
+                vraie vie.
+              </li>
+              <li>
+                <strong>Certaines zones doublent ou triplent.</strong> L&apos;anneau fin
+                du bord double les points, celui du milieu les triple. Le centre vert
+                vaut 25, le rouge 50.
+              </li>
+              <li>
+                <strong>La dernière fléchette doit être un double.</strong> C&apos;est la
+                règle qui surprend : s&apos;il te reste 32, il faut toucher le double 16.
+                Le centre rouge fait aussi l&apos;affaire.
+              </li>
+              <li>
+                <strong>Trop loin = tour annulé.</strong> Si tu passes sous 0, que tu
+                tombes pile sur 1, ou que tu arrives à 0 sans double, ton score revient
+                à celui du début du tour.
+              </li>
+            </ol>
+            <button onClick={closeRules} className="jeu-modal-button">
+              {totalDarts === 0 ? "C'est parti" : "Fermer"}
+            </button>
+          </div>
+        </div>
       )}
 
       {won && (
@@ -330,19 +450,25 @@ export default function GamePage() {
             {totalDarts <= 9 ? (
               <div className="jeu-prize">
                 <p id="jeu-modal-title" className="jeu-modal-title jeu-modal-title--prize">
-                  🎯 9-DARTER — Partie offerte !
+                  🎯 {totalDarts} fléchettes — partie offerte !
                 </p>
                 <p className="jeu-modal-text">
-                  Tu viens de finir le 501 en {totalDarts} darts. Screenshot cette page et montre-la à l&apos;ouverture avec ton code :
+                  Neuf fléchettes, c&apos;est le minimum théorique pour finir un 501 : très peu
+                  de joueurs y arrivent une fois dans leur vie. Fais une capture de cette
+                  page et montre-la à l&apos;ouverture avec ton code :
                 </p>
                 <p className="jeu-promo-code">NINEDARTER</p>
               </div>
             ) : (
               <>
-                <p className="jeu-modal-eyebrow">Game shot !</p>
+                <p className="jeu-modal-eyebrow">Gagné !</p>
                 <p id="jeu-modal-title" className="jeu-modal-score">{totalDarts}</p>
                 <p className="jeu-modal-text">
-                  {totalDarts <= 15 ? "darts — très propre" : totalDarts <= 24 ? "darts — solide" : "darts pour finir le 501"}
+                  {totalDarts <= 15
+                    ? "fléchettes pour aller de 501 à 0 — très propre"
+                    : totalDarts <= 24
+                      ? "fléchettes pour aller de 501 à 0 — solide"
+                      : "fléchettes pour aller de 501 à 0"}
                 </p>
               </>
             )}
@@ -376,17 +502,18 @@ export default function GamePage() {
         }
 
         .jeu-visit-slot {
-          display: grid;
-          place-items: center;
-          padding: 0.55rem 0.4rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.05rem;
+          padding: 0.45rem 0.35rem;
           border-radius: 8px;
           background: #1e1e1e;
           border: 1px solid rgba(255, 255, 255, 0.06);
-          font-family: var(--font-heading), "Bebas Neue", sans-serif;
-          font-size: 1.1rem;
-          letter-spacing: 0.04em;
           color: rgba(154, 154, 154, 0.7);
-          min-height: 40px;
+          min-height: 46px;
+          text-align: center;
         }
 
         .jeu-visit-slot.is-filled {
@@ -395,13 +522,42 @@ export default function GamePage() {
           border-color: rgba(230, 57, 70, 0.3);
         }
 
+        .jeu-visit-label {
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: 1.05rem;
+          letter-spacing: 0.04em;
+          line-height: 1.1;
+        }
+
+        .jeu-visit-points {
+          font-size: 0.6rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #9a9a9a;
+        }
+
+        .jeu-visit-empty {
+          font-size: 0.62rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
         .jeu-checkout {
           display: flex;
           align-items: center;
-          gap: 0.6rem;
+          flex-wrap: wrap;
+          gap: 0.4rem 0.6rem;
           padding: 0.55rem 0.8rem;
           border-bottom: 1px solid rgba(255, 255, 255, 0.06);
           background: rgba(244, 160, 36, 0.06);
+        }
+
+        .jeu-checkout-note {
+          flex: 1 1 9rem;
+          min-width: 0;
+          font-size: 0.68rem;
+          line-height: 1.35;
+          color: #9a9a9a;
         }
 
         .jeu-checkout-label {
@@ -469,13 +625,28 @@ export default function GamePage() {
           color: #9a9a9a;
         }
 
-        .jeu-score-big {
+        .jeu-score-right {
           justify-self: end;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+        }
+
+        .jeu-score-big {
           font-family: var(--font-heading), "Bebas Neue", sans-serif;
           font-size: clamp(3.4rem, 14vw, 5.4rem);
           line-height: 0.95;
           color: #F0E6D2;
           letter-spacing: 0.01em;
+        }
+
+        .jeu-score-caption {
+          margin-top: 0.15rem;
+          font-size: 0.62rem;
+          font-weight: 700;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #9a9a9a;
         }
 
         .jeu-score-footer {
@@ -512,21 +683,149 @@ export default function GamePage() {
           letter-spacing: 0.02em;
         }
 
+        .jeu-rules-link {
+          margin-top: 0.5rem;
+          padding: 0.3rem 0.85rem;
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 999px;
+          background: transparent;
+          color: #9a9a9a;
+          font-family: inherit;
+          font-size: 0.75rem;
+          letter-spacing: 0.06em;
+          cursor: pointer;
+          transition: color 200ms ease, border-color 200ms ease;
+        }
+
+        .jeu-rules-link:hover,
+        .jeu-rules-link:focus-visible {
+          color: #F0E6D2;
+          border-color: rgba(230, 57, 70, 0.6);
+          outline: none;
+        }
+
+        .jeu-legend {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.35rem 1rem;
+          max-width: 520px;
+          margin: 0.6rem 0 0;
+          padding: 0;
+          list-style: none;
+          font-size: 0.72rem;
+          color: #9a9a9a;
+        }
+
+        .jeu-legend li {
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+        }
+
+        .jeu-legend strong {
+          font-weight: 700;
+          color: #F0E6D2;
+        }
+
+        .jeu-legend-swatch {
+          width: 10px;
+          height: 10px;
+          border-radius: 3px;
+          flex: none;
+        }
+
+        .jeu-legend-swatch--accent {
+          background: linear-gradient(90deg, #E63946 50%, #2D8B46 50%);
+        }
+
+        .jeu-legend-swatch--green {
+          background: #2D8B46;
+          border-radius: 999px;
+        }
+
+        .jeu-legend-swatch--red {
+          background: #E63946;
+          border-radius: 999px;
+        }
+
+        .jeu-modal--rules {
+          max-width: 440px;
+          text-align: left;
+          max-height: 85vh;
+          overflow-y: auto;
+        }
+
+        .jeu-rules-title {
+          margin: 0 0 1rem;
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: 1.6rem;
+          letter-spacing: 0.04em;
+          color: #F0E6D2;
+          text-align: center;
+        }
+
+        .jeu-rules-list {
+          margin: 0;
+          padding-left: 1.1rem;
+          text-align: left;
+          display: flex;
+          flex-direction: column;
+          gap: 0.7rem;
+          font-size: 0.88rem;
+          line-height: 1.45;
+          color: #9a9a9a;
+        }
+
+        .jeu-rules-list strong {
+          color: #F0E6D2;
+        }
+
+        .jeu-rules-list li::marker {
+          color: #E63946;
+          font-weight: 700;
+        }
+
+        .jeu-modal--rules .jeu-modal-button {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
         .jeu-bust {
           position: fixed;
           inset: 0;
-          display: grid;
-          place-items: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.4rem;
+          padding: 1.5rem;
+          text-align: center;
           z-index: 95;
-          font-family: var(--font-heading), "Bebas Neue", sans-serif;
-          font-size: clamp(4rem, 18vw, 9rem);
-          letter-spacing: 0.1em;
-          color: #E63946;
-          text-shadow: 0 0 40px rgba(230, 57, 70, 0.7);
+          background: rgba(10, 10, 10, 0.6);
+          backdrop-filter: blur(2px);
           pointer-events: none;
           animation:
             jeu-bust-in 180ms ease both,
             jeu-bust-out 320ms ease 1.25s both;
+        }
+
+        .jeu-bust-word {
+          font-family: var(--font-heading), "Bebas Neue", sans-serif;
+          font-size: clamp(3.4rem, 16vw, 8rem);
+          line-height: 1;
+          letter-spacing: 0.1em;
+          color: #E63946;
+          text-shadow: 0 0 40px rgba(230, 57, 70, 0.7);
+        }
+
+        .jeu-bust-sub {
+          max-width: 26rem;
+          font-size: 0.95rem;
+          line-height: 1.4;
+          color: #F0E6D2;
+          text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9);
         }
 
         @keyframes jeu-bust-in {
@@ -670,9 +969,17 @@ export default function GamePage() {
           }
 
           .jeu-visit-slot {
-            font-size: 1rem;
-            min-height: 34px;
-            padding: 0.4rem 0.3rem;
+            min-height: 42px;
+            padding: 0.35rem 0.25rem;
+          }
+
+          .jeu-visit-label {
+            font-size: 0.92rem;
+          }
+
+          .jeu-visit-points,
+          .jeu-visit-empty {
+            font-size: 0.55rem;
           }
 
           .jeu-checkout-label {
@@ -681,6 +988,28 @@ export default function GamePage() {
 
           .jeu-checkout-step {
             font-size: 0.82rem;
+          }
+
+          .jeu-checkout-note {
+            font-size: 0.64rem;
+          }
+
+          .jeu-score-caption {
+            font-size: 0.55rem;
+          }
+
+          .jeu-legend {
+            gap: 0.25rem 0.7rem;
+            font-size: 0.66rem;
+          }
+
+          .jeu-rules-list {
+            font-size: 0.82rem;
+            gap: 0.6rem;
+          }
+
+          .jeu-bust-sub {
+            font-size: 0.85rem;
           }
 
           .jeu-score-main {
@@ -700,8 +1029,16 @@ export default function GamePage() {
             font-size: 1rem;
           }
 
+          .jeu-score-footer {
+            gap: 0.35rem;
+            padding: 0.6rem 0.5rem;
+          }
+
           .jeu-foot-item span {
-            font-size: 0.52rem;
+            font-size: 0.5rem;
+            letter-spacing: 0.06em;
+            white-space: normal;
+            text-align: center;
           }
 
           .jeu-foot-item strong {
