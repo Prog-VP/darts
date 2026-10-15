@@ -128,11 +128,11 @@ export default function InviteForm() {
         </div>
 
         <p className="form-note">
-          Un mail au lancement. Pas de spam.
+          Location ou tournoi : on vous recontacte rapidement.
         </p>
 
         <button type="submit" disabled={submitting}>
-          {submitting ? "Envoi…" : "S’inscrire"}
+          {submitting ? "Envoi…" : "Envoyer"}
         </button>
 
         {errorMessage && (

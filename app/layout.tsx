@@ -28,11 +28,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://lausanne-darts.ch"),
   title: "Lausanne Darts | Le spot fléchettes de Lausanne",
   description:
-    "Ouverture cet automne — Espace dédié aux fléchettes à Lausanne. Pistes connectées, privatisation.",
+    "Location de matériel de fléchettes et organisation de tournois à Lausanne et dans la région.",
   openGraph: {
-    title: "Lausanne Darts | Ouverture cet automne",
+    title: "Lausanne Darts | Location de matériel et tournois",
     description:
-      "Espace dédié aux fléchettes à Lausanne. Pistes connectées, privatisation.",
+      "Location de matériel de fléchettes et organisation de tournois à Lausanne et dans la région.",
     url: "https://lausanne-darts.ch",
     type: "website",
     locale: "fr_CH",

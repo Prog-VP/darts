@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import InviteForm from "./components/InviteForm";
 
-type SectionId = "accueil" | "lieu" | "faq" | "contact";
+type SectionId = "accueil" | "services" | "faq" | "contact";
 
 const ThreeBackground = dynamic(() => import("./ThreeBackground"), {
   ssr: false,
@@ -12,44 +12,48 @@ const ThreeBackground = dynamic(() => import("./ThreeBackground"), {
 
 const SECTION_LINKS: Array<{ id: SectionId; label: string }> = [
   { id: "accueil", label: "Accueil" },
-  { id: "lieu", label: "Le lieu" },
+  { id: "services", label: "Services" },
   { id: "faq", label: "FAQ" },
   { id: "contact", label: "Contact" },
 ];
 
 const FEATURE_CARDS = [
   {
-    title: "Qualité de jeu",
-    description: "Cibles en sisal, fléchettes en état, vraies conditions de jeu.",
+    title: "Location de matériel",
+    description:
+      "Cibles en sisal, fléchettes en état, scoring connecté : tout le nécessaire pour jouer dans de vraies conditions, chez vous ou à votre événement.",
   },
   {
-    title: "Score auto",
-    description: "Cibles connectées et stats.",
+    title: "Organisation de tournois",
+    description:
+      "Soirée entre amis, anniversaire, team building ou compétition : on monte le tournoi de A à Z.",
   },
 ];
 
 const FAQ_ITEMS = [
   {
-    question: "Où ?",
-    answer: "Rue St-Martin 9, 1003 Lausanne.",
+    question: "Le lieu va-t-il ouvrir ?",
+    answer:
+      "Pas pour l’instant. Nous n’avons pas trouvé de local à un prix raisonnable, avec un statut d’établissement commercial (nécessaire pour vendre de l’alcool) et sans devoir racheter un fonds de commerce.",
   },
   {
-    question: "Quand ?",
+    question: "Que proposez-vous ?",
     answer:
-      "Pas encore de date d’ouverture. Le projet prend un peu plus de temps que prévu : on se retrouve cet automne pour la suite.",
+      "La location de matériel de fléchettes et l’organisation de tournois, à Lausanne et dans la région.",
   },
   {
     question: "Pour qui ?",
-    answer: "Ouvert à tous, passionnés comme amateurs.",
+    answer: "Particuliers, associations, entreprises : passionnés comme amateurs.",
   },
   {
-    question: "À quelle occasion ?",
+    question: "Pour quelle occasion ?",
     answer:
-      "Pour jouer, s’entraîner, préparer la compétition, un date, un anniversaire ou un team building.",
+      "Un anniversaire, une soirée, un team building, une fête de quartier ou une compétition.",
   },
   {
-    question: "Comment réserver ?",
-    answer: "La plateforme de réservation sera publiée bientôt.",
+    question: "Comment nous contacter ?",
+    answer:
+      "Laissez vos coordonnées dans le formulaire ou écrivez à contact@lausanne-darts.ch.",
   },
 ] as const;
 
@@ -131,9 +135,8 @@ export default function Home() {
           </nav>
 
           <div className="header-actions">
-            <a className="nav-link header-jeu" href="/jeu">🎯 Jeu</a>
             <a className="header-cta" href="#contact">
-              Être prévenu
+              Nous contacter
             </a>
           </div>
 
@@ -195,20 +198,13 @@ export default function Home() {
 
           <div className="drawer-footer">
             <a
-              href="/jeu"
-              className="drawer-link drawer-link--jeu"
-              onClick={closeMenu}
-            >
-              <span aria-hidden="true">🎯</span> Jeu
-            </a>
-            <a
               href="#contact"
               className="drawer-cta"
               onClick={closeMenu}
             >
-              Être prévenu
+              Nous contacter
             </a>
-            <p className="drawer-meta">Opening · à l’automne 2026</p>
+            <p className="drawer-meta">Location · Tournois</p>
           </div>
         </aside>
 
@@ -235,7 +231,7 @@ export default function Home() {
             </h1>
 
             <p className="hero-lead">
-              60 m² dédiés aux fléchettes.
+              Les fléchettes, là où vous êtes.
             </p>
 
             <p className="hero-support">
@@ -246,41 +242,44 @@ export default function Home() {
 
             <div className="hero-actions">
               <a className="button button-primary" href="#contact">
-                Être prévenu
+                Nous contacter
               </a>
-              <a className="button button-secondary" href="#lieu">
-                Voir le lieu
+              <a className="button button-secondary" href="#services">
+                Nos services
               </a>
             </div>
           </div>
 
           <div className="hero-panels">
             <article className="glass-card status-card">
-              <p className="card-eyebrow">Des nouvelles du chantier</p>
+              <p className="card-eyebrow">Des nouvelles du projet</p>
 
               <p className="status-headline">
-                Pas encore de date d’ouverture
+                Pas de local pour l’instant
               </p>
 
               <p className="status-text">
-                Le projet prend un peu plus de temps que prévu : rien à
-                annoncer pour l’instant.
+                À deux reprises, nous avons failli décrocher un bon spot.
+                Malheureusement, nous n’avons pas trouvé de local qui coche
+                toutes les cases : au centre-ville ou pas loin, un loyer raisonnable, un statut
+                d’établissement commercial pour avoir le droit de vendre de
+                l’alcool, et sans racheter un fonds de commerce.
               </p>
 
               <p className="status-text">
-                Profitez de l’été. On revient vers vous avec du concret à la
-                rentrée.
+                L’aventure continue autrement : nous restons disponibles pour
+                la location de matériel et l’organisation de tournois.
               </p>
 
-              <p className="status-badge">On se voit cet automne 🎯</p>
+              <p className="status-badge">Merci pour votre soutien 🎯</p>
             </article>
           </div>
         </section>
 
-        <section id="lieu" className="section-block">
+        <section id="services" className="section-block">
           <div className="section-heading">
-            <h2 className="section-title">Le lieu</h2>
-            <p className="section-meta">Rue St-Martin 9, Lausanne.</p>
+            <h2 className="section-title">Nos services</h2>
+            <p className="section-meta">Lausanne et région.</p>
           </div>
 
           <div className="feature-grid">
@@ -315,7 +314,7 @@ export default function Home() {
 
         <section id="contact" className="section-block contact-section">
           <div className="section-heading contact-heading">
-            <h2 className="section-title">Être prévenu</h2>
+            <h2 className="section-title">Nous contacter</h2>
           </div>
 
           <div className="contact-layout">

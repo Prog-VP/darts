@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
       from: FROM,
       to: CONTACT_EMAIL,
       replyTo: email,
-      subject: `Nouvelle inscription — ${prenom} ${nom}`,
+      subject: `Nouvelle demande de contact — ${prenom} ${nom}`,
       html: `
         <div style="font-family: sans-serif; color: #222;">
-          <h2 style="margin:0 0 12px">Nouvelle inscription</h2>
+          <h2 style="margin:0 0 12px">Nouvelle demande de contact</h2>
           <p><strong>Prénom :</strong> ${escapeHtml(prenom)}</p>
           <p><strong>Nom :</strong> ${escapeHtml(nom)}</p>
           <p><strong>Email :</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: "Merci pour ton inscription — Lausanne Darts 🎯",
-      text: `Hello ${prenom},\n\nMerci pour ton inscription — on est ravis de te compter parmi les premiers à suivre l'aventure Lausanne Darts.\n\nPoint d'étape : on n'a pas encore de date d'ouverture, le projet prend un peu plus de temps que prévu. Profite de l'été, on se voit cet automne.\n\nOn t'écrira dès qu'on aura une date.\nRue St-Martin 9, Lausanne.\n\nÀ très vite,\nL'équipe Lausanne Darts`,
+      subject: "Merci pour ton message — Lausanne Darts 🎯",
+      text: `Hello ${prenom},\n\nMerci pour ton message, on revient vers toi rapidement.\n\nPoint d'étape : on n'a malheureusement pas trouvé de local qui permette de rester à un prix raisonnable, avec un statut d'établissement commercial pour vendre de l'alcool, sans racheter un fonds de commerce. Le lieu n'ouvrira donc pas pour l'instant.\n\nOn reste disponibles pour la location de matériel et l'organisation de tournois.\n\nÀ très vite,\nL'équipe Lausanne Darts`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a1a; max-width: 560px; margin: 0 auto; padding: 32px 28px; background: #0a0a0a; color: #F0E6D2; border-radius: 12px;">
           <div style="text-align: center; margin-bottom: 24px;">
@@ -55,21 +55,21 @@ export async function POST(request: NextRequest) {
           </div>
 
           <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.04em; margin: 24px 0 12px; color: #F0E6D2;">
-            Merci pour ton inscription, ${escapeHtml(prenom)} 🎯
+            Merci pour ton message, ${escapeHtml(prenom)} 🎯
           </h1>
 
           <p style="font-size: 15px; line-height: 1.6; color: #cfcfc5;">
-            On est ravis de te compter parmi les premiers à suivre l'aventure <strong style="color: #F0E6D2;">Lausanne Darts</strong> — le premier vrai lieu dédié aux fléchettes en ville.
+            On a bien reçu ta demande, l'équipe <strong style="color: #F0E6D2;">Lausanne Darts</strong> revient vers toi rapidement.
           </p>
 
           <p style="font-size: 15px; line-height: 1.6; color: #cfcfc5;">
-            Point d'étape : on n'a pas encore de date d'ouverture, le projet prend un peu plus de temps que prévu. Profite de l'été — on se voit cet automne, et on t'écrit dès qu'on a une date.
+            Point d'étape : on n'a malheureusement pas trouvé de local qui permette de rester à un prix raisonnable, avec un statut d'établissement commercial pour vendre de l'alcool, sans racheter un fonds de commerce. Le lieu n'ouvrira donc pas pour l'instant.
           </p>
 
           <div style="margin: 20px 0; padding: 16px 20px; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; background: #141414; text-align: center;">
-            <div style="font-size: 11px; letter-spacing: 0.2em; color: #9a9a9a; text-transform: uppercase;">Opening</div>
-            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; margin-top: 4px;">Cet automne</div>
-            <div style="font-size: 13px; color: #9a9a9a; margin-top: 6px;">Rue St-Martin 9, Lausanne</div>
+            <div style="font-size: 11px; letter-spacing: 0.2em; color: #9a9a9a; text-transform: uppercase;">On reste disponibles</div>
+            <div style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; margin-top: 4px;">Location de matériel · Tournois</div>
+            <div style="font-size: 13px; color: #9a9a9a; margin-top: 6px;">Lausanne et région</div>
           </div>
 
           <p style="font-size: 13px; color: #9a9a9a; margin-top: 28px; text-align: center;">

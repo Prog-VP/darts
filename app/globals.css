@@ -260,20 +260,6 @@ canvas {
   box-shadow: 1px 1px 0 var(--cream);
 }
 
-.header-jeu {
-  padding: 0.4rem 0.9rem;
-  border: 2px solid var(--green);
-  color: var(--green);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-}
-
-.header-jeu:hover {
-  color: var(--bg-deep);
-  background: var(--green);
-  border-color: var(--green);
-}
-
 .brand-badge {
   display: inline-flex;
   align-items: center;
@@ -459,18 +445,7 @@ canvas {
   border-top: 2px dashed rgba(247, 232, 196, 0.18);
 }
 
-.drawer-link--jeu {
-  color: var(--green);
-  background: transparent;
-  border-color: var(--green);
-}
 
-.drawer-link--jeu:hover,
-.drawer-link--jeu:focus-visible {
-  color: var(--bg-deep);
-  background: var(--green);
-  border-color: var(--green);
-}
 
 .drawer-cta {
   display: inline-flex;
