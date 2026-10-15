@@ -231,12 +231,12 @@ export default function Home() {
             </h1>
 
             <p className="hero-lead">
-              Les fléchettes, là où vous êtes.
+              Location de matériel et tournois de fléchettes.
             </p>
 
             <p className="hero-support">
               {
-                "Fini les setups de bar coincés entre la porte de sortie et le billard, avec des embouts cassés et des cibles mal entretenues."
+                "Des cibles en sisal, des fléchettes en état et un tournoi clé en main pour votre soirée, votre anniversaire ou votre team building."
               }
             </p>
 
@@ -271,7 +271,7 @@ export default function Home() {
                 la location de matériel et l’organisation de tournois.
               </p>
 
-              <p className="status-badge">Merci pour votre soutien 🎯</p>
+              <p className="status-badge">Merci pour votre soutien, et peut-être à bientôt 🎯</p>
             </article>
           </div>
         </section>
